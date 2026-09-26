@@ -1,20 +1,25 @@
 # SCADA Engineering Data Analyzer
 
-**Release status: Semantic Validation Candidate**
+**Release status: Semantic Bugfix Baseline (`v1.5.1`)**
 
-Baseline tag: `v1.5-semantic-validation-candidate` — 151/151 tests PASS · Real project validation: pending · Production Approval: NOT APPROVED
+| Tag | Status |
+| --- | --- |
+| `v1.5-semantic-validation-candidate` | Semantic Validation Candidate — 151/151 tests PASS · Real Project Round 1: FAIL |
+| `v1.5.1` | Semantic Bugfix Baseline — 171/171 tests PASS · Real Project Round 2: PASS (P0 regression scope) · Production Approval: NOT APPROVED |
+
+`v1.5.1` fixes the three P0 defects found in real-project Round 1 (MTEXT `\U+XXXX` decoding, unavailable-source cross-reference semantics, PDF clause-level citation). Summary: [docs/REAL_PROJECT_VALIDATION_STATUS.md](docs/REAL_PROJECT_VALIDATION_STATUS.md).
 
 This version is not Production and is not an AI Assistant.
 
 | Validation area | Status |
 | --- | --- |
-| Functional Regression | PASS — 151/151 tests; original 100 CAD tests unchanged |
+| Functional Regression | PASS — 171/171 tests (151 from v1.5 unchanged + 20 Round 1 regression tests) |
 | Source Integrity | PASS — 13 test/synthetic sources, 0 hash changes |
 | Parser Integrity | PASS — verified test/synthetic scope |
 | Normalized Data Integrity | PASS — verified CSV/SQLite consistency |
 | Engineering Semantics | PASS — defined test scope only |
 | Acceptance Gate | PASS — 9/9 |
-| Real Project Validation | NOT TESTED |
+| Real Project Validation | SB12 Round 1 FAIL (v1.5) → Round 2 PASS for the P0 fixes (v1.5.1); SELF-REVIEWED; IFC / BOQ / Clash not tested |
 | Human Engineering Approval | NOT APPROVED |
 | Production Approval | NOT APPROVED |
 

@@ -114,7 +114,7 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
 
 def _empty_reports(out, store):
     from engineering_data import Store, COMMON
-    reports = {'cad': ['layers','texts','blocks','dimensions','attribs','file_index','scada_hits','scada_excluded','object_hits','block_summary'], 'ifc': ['ifc_objects','ifc_systems','ifc_spaces','ifc_summary'], 'excel': ['excel_sheets','excel_tables','boq_items','boq_summary','boq_compare'], 'pdf': ['pdf_pages','pdf_sections','pdf_hits','pdf_summary'], 'docx': ['docx_sections','docx_tables','requirements'], 'navisworks': ['navis_clashes','navis_summary'], 'cross_reference': ['cross_reference']}
+    reports = {'cad': ['layers','texts','blocks','dimensions','attribs','file_index','scada_hits','scada_excluded','object_hits','block_summary'], 'ifc': ['ifc_objects','ifc_systems','ifc_spaces','ifc_summary'], 'excel': ['excel_sheets','excel_tables','boq_items','boq_summary','boq_compare'], 'pdf': ['pdf_pages','pdf_sections','pdf_hits','pdf_summary'], 'docx': ['docx_sections','docx_tables','requirements'], 'navisworks': ['navis_clashes','navis_summary'], 'cross_reference': ['cross_reference', 'coverage']}
     for folder, names in reports.items():
         for name in names:
             path = out / folder / (name + '.csv')

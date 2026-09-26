@@ -30,16 +30,36 @@ def xyz(p):
 
 
 _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+_DXF_UNICODE = re.compile(r"\\U\+([0-9A-Fa-f]{4})")
+_LEFTOVER_ESCAPE = re.compile(r"\\[UM]\+[0-9A-Fa-f]")
+
+
+def decode_dxf_unicode(text):
+    """Decode DXF '\\U+XXXX' escapes (exactly 4 hex digits). Malformed escapes and surrogate code
+    points are left as-is so text_quality can flag them. ezdxf's own decoder is not used because it
+    turns a truncated '\\U+4ED' into a wrong character."""
+    if not text or "\\U+" not in text:
+        return text
+
+    def one(m):
+        code = int(m.group(1), 16)
+        return m.group(0) if 0xD800 <= code <= 0xDFFF else chr(code)
+    return _DXF_UNICODE.sub(one, text)
+
+
+def canonical_text(raw):
+    """TEXT / ATTRIB / names -> canonical text used everywhere downstream."""
+    return decode_dxf_unicode(raw or "") if raw is not None else raw
 
 
 def text_quality(text):
     """OK / EMPTY / SUSPECT_ENCODING. Text is never altered, only flagged.
-    Suspect = contains U+FFFD or control characters, or is made mostly (>= 50%) of '?'.
-    A normal sentence that merely contains a '?' is OK."""
+    Suspect = contains U+FFFD, control characters or an escape left undecoded (\\U+ / \\M+), or is made
+    mostly (>= 50%) of '?'. A normal sentence that merely contains a '?' is OK."""
     if text is None or not str(text).strip():
         return "EMPTY"
     t = "".join(str(text).split())
-    if "�" in t or _CONTROL.search(str(text)):
+    if "�" in t or _CONTROL.search(str(text)) or _LEFTOVER_ESCAPE.search(str(text)):
         return "SUSPECT_ENCODING"
     if t.count("?") * 2 >= len(t):
         return "SUSPECT_ENCODING"
@@ -47,10 +67,13 @@ def text_quality(text):
 
 
 def mtext_plain(e):
+    """MTEXT -> canonical text. Formatting codes are stripped FIRST and '\\U+XXXX' decoded after, so an
+    escaped '\\', '{' or '}' can never be re-read as a formatting code."""
     try:
-        return e.plain_text()
+        text = e.plain_text()
     except Exception:  # noqa: BLE001
-        return e.text
+        text = e.text
+    return decode_dxf_unicode(text)
 
 
 def analyze(dxf_path, rel_name):
@@ -62,46 +85,51 @@ def analyze(dxf_path, rel_name):
         for e in layout:
             t = e.dxftype()
             res["entity_types"][t] += 1
-            layer = e.dxf.get("layer", "0")
+            raw_layer = e.dxf.get("layer", "0")
+            layer = canonical_text(raw_layer)
             layer_count[layer] += 1
             h = e.dxf.get("handle", "")
-            ctx = f"BLOCKDEF:{layout.name}" if in_block_def else ""
+            ctx = f"BLOCKDEF:{canonical_text(layout.name)}" if in_block_def else ""
             if t in ("TEXT", "MTEXT"):
                 x, y, z = xyz(e.dxf.insert)
-                text = e.dxf.text if t == "TEXT" else mtext_plain(e)
+                text = canonical_text(e.dxf.text) if t == "TEXT" else mtext_plain(e)
                 res["texts"].append(dict(file=rel_name, layer=layer, entity_type=t, text=text,
                                          x=x, y=y, z=z, rotation=e.dxf.get("rotation", 0),
                                          handle=h, context=ctx, text_quality=text_quality(text)))
             elif t == "INSERT":
                 x, y, z = xyz(e.dxf.insert)
+                name = canonical_text(e.dxf.name)
                 res["blocks"].append(dict(
-                    file=rel_name, layer=layer, block_name=e.dxf.name, x=x, y=y, z=z,
+                    file=rel_name, layer=layer, block_name=name, x=x, y=y, z=z,
                     rotation=e.dxf.get("rotation", 0), xscale=e.dxf.get("xscale", 1),
                     yscale=e.dxf.get("yscale", 1), zscale=e.dxf.get("zscale", 1),
                     handle=h, context=ctx))
                 for a in e.attribs:
                     ax, ay, az = xyz(a.dxf.insert)
-                    al = a.dxf.get("layer", layer)
-                    res["attribs"].append(dict(file=rel_name, layer=al, block_name=e.dxf.name,
-                                               tag=a.dxf.tag, text=a.dxf.text, x=ax, y=ay, z=az,
+                    al = canonical_text(a.dxf.get("layer", raw_layer))
+                    tag, atext = canonical_text(a.dxf.tag), canonical_text(a.dxf.text)
+                    res["attribs"].append(dict(file=rel_name, layer=al, block_name=name,
+                                               tag=tag, text=atext, x=ax, y=ay, z=az,
                                                handle=a.dxf.get("handle", ""), parent_handle=h))
                     res["texts"].append(dict(file=rel_name, layer=al, entity_type="ATTRIB",
-                                             text=a.dxf.text, x=ax, y=ay, z=az,
+                                             text=atext, x=ax, y=ay, z=az,
                                              rotation=a.dxf.get("rotation", 0),
-                                             handle=a.dxf.get("handle", ""), context=f"tag={a.dxf.tag}",
-                                             text_quality=text_quality(a.dxf.text)))
+                                             handle=a.dxf.get("handle", ""), context=f"tag={tag}",
+                                             text_quality=text_quality(atext)))
             elif t == "DIMENSION":
                 try:
                     meas = round(e.get_measurement(), 4)
                 except Exception:  # noqa: BLE001
                     meas = ""
                 res["dimensions"].append(dict(file=rel_name, layer=layer, dimtype=e.dimtype,
-                                              measurement=meas, text_override=e.dxf.get("text", ""),
+                                              measurement=meas,
+                                              text_override=canonical_text(e.dxf.get("text", "")),
                                               handle=h))
     for l in doc.layers:
-        res["layers"].append(dict(file=rel_name, layer=l.dxf.name, color=l.dxf.get("color", 7),
+        lname = canonical_text(l.dxf.name)
+        res["layers"].append(dict(file=rel_name, layer=lname, color=l.dxf.get("color", 7),
                                   linetype=l.dxf.get("linetype", ""),
-                                  entity_count=layer_count.get(l.dxf.name, 0)))
+                                  entity_count=layer_count.get(lname, 0)))
     info = dict(dxf_version=doc.dxfversion, entity_count=sum(res["entity_types"].values()),
                 layer_count=len(res["layers"]),
                 block_count=len([b for b in doc.blocks if not b.name.startswith("*")]),

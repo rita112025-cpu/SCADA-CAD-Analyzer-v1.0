@@ -116,10 +116,20 @@ def clash_results(objects,clashes):
             yield row
 
 
+COVERAGE_FIELDS=['check_type','status','reason','a_count','b_count']
+
+
 def run(store,cfg,historical_boq=None):
     objects=list(store.rows('engineering_objects'))
     boq=[r for r in store.rows('boq_items') if r.get('source_file')!=historical_boq]
     def emit(row): store.add('cross_reference_results',row,'cross_reference/cross_reference.csv')
+    def cover(check,a,b,reason_missing):
+        # A whole source category that was not supplied/parsed is NOT_TESTED, never MISSING_B.
+        store.report('cross_reference/coverage.csv',dict(check_type=check,
+            status='PERFORMED' if a and b else 'NOT_TESTED',
+            reason='' if a and b else (reason_missing if not b else 'No side-A records in supplied sources.'),
+            a_count=a,b_count=b,source_type='CrossReference',evidence_level='DERIVED'))
+        return bool(a and b)
     eligible=[]
     for obj in objects:
         allowed,reason=boq_eligibility(obj)
@@ -127,13 +137,18 @@ def run(store,cfg,historical_boq=None):
         elif obj.get('source_type')=='IFC':
             emit(result('IFC_OBJECT_VS_BOQ',obj,{},norm(obj.get('name')),'NOT_APPLICABLE',0,
                         reason+': outside equipment comparison scope.',reason))
-    for row in compare_objects(eligible,boq): emit(row)
+    if cover('OBJECT_VS_BOQ',len(eligible),len(boq),'BOQ source unavailable: no BOQ records supplied/parsed.'):
+        for row in compare_objects(eligible,boq): emit(row)
     requirements=defaultdict(list)
-    for req in store.rows('requirements'):
+    all_requirements=list(store.rows('requirements'))
+    for req in all_requirements:
         for keyword in (req.get('keyword') or '').split('|'):
             if keyword: requirements[norm(keyword)].append(req)
+    if not cover('KEYWORD_VS_REQUIREMENT',len(objects),len(all_requirements),
+                 'Requirement source unavailable: no requirement records parsed from supplied documents.'):
+        requirements=None
     rules=scada_rules.build_rules(dict(cfg,keywords=cfg.get('document_keywords',cfg.get('keywords',[]))))
-    for obj in objects:
+    for obj in (objects if requirements is not None else []):
         text=(obj.get('system') or (obj.get('name') if obj.get('object_type') in ('IfcSystem','IfcDistributionSystem') else '')) if obj.get('source_type')=='IFC' else obj.get('name','')
         for hit in scada_rules.find_matches(text,rules):
             if hit['confidence']==scada_rules.EXCLUDED: continue
@@ -143,4 +158,6 @@ def run(store,cfg,historical_boq=None):
                 emit(result(kind,obj,req,key,'UNCERTAIN' if len(reqs)>20 else ('RELATED' if req else 'MISSING_B'),
                     .5 if req else 0, 'Shared keyword only; requirement satisfaction is not evaluated.',
                     'KEYWORD_RELATION','INSUFFICIENT_EVIDENCE',candidate_count=len(reqs)))
-    for row in clash_results(objects,store.rows('clashes')): emit(row)
+    clashes=list(store.rows('clashes'))
+    if cover('CLASH_VS_OBJECT',len(clashes),len(objects),'Model/drawing source unavailable: no engineering objects to resolve clash identifiers against.'):
+        for row in clash_results(objects,clashes): emit(row)

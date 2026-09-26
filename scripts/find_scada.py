@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import load_config, resolve, log_error
-from analyze_dxf import iter_layouts, xyz, mtext_plain
+from analyze_dxf import iter_layouts, xyz, mtext_plain, canonical_text
 import scada_rules
 from scada_rules import HIT_FIELDS, OBJECT_FIELDS, EXCLUDED
 
@@ -34,21 +34,23 @@ def search_doc(doc, rel, rules):
             (excluded if m["confidence"] == EXCLUDED else hits).append(row)
 
     for l in doc.layers:
-        add("LAYER_NAME", l.dxf.name, "", l.dxf.name, ("", "", ""), l.dxf.get("handle", ""))
+        name = canonical_text(l.dxf.name)
+        add("LAYER_NAME", name, "", name, ("", "", ""), l.dxf.get("handle", ""))
     for layout in iter_layouts(doc):
-        ctx = "" if layout.is_any_layout else layout.name
+        ctx = "" if layout.is_any_layout else canonical_text(layout.name)
         for e in layout:
             t = e.dxftype()
-            layer, h = e.dxf.get("layer", "0"), e.dxf.get("handle", "")
+            layer, h = canonical_text(e.dxf.get("layer", "0")), e.dxf.get("handle", "")
             if t == "TEXT":
-                add("TEXT", layer, ctx, e.dxf.text, xyz(e.dxf.insert), h)
+                add("TEXT", layer, ctx, canonical_text(e.dxf.text), xyz(e.dxf.insert), h)
             elif t == "MTEXT":
                 add("MTEXT", layer, ctx, mtext_plain(e), xyz(e.dxf.insert), h)
             elif t == "INSERT":
-                add("BLOCK_NAME", layer, e.dxf.name, e.dxf.name, xyz(e.dxf.insert), h)
+                block = canonical_text(e.dxf.name)
+                add("BLOCK_NAME", layer, block, block, xyz(e.dxf.insert), h)
                 for a in e.attribs:
-                    add("ATTRIB", a.dxf.get("layer", layer), e.dxf.name, a.dxf.text,
-                        xyz(a.dxf.insert), a.dxf.get("handle", ""))
+                    add("ATTRIB", canonical_text(a.dxf.get("layer", "")) or layer, block,
+                        canonical_text(a.dxf.text), xyz(a.dxf.insert), a.dxf.get("handle", ""))
     return hits, excluded
 
 
