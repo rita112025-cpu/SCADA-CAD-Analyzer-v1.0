@@ -6,7 +6,7 @@ Detailed evidence (source copies, analyzer output, review worksheets) is retaine
 | --- | --- | --- | --- |
 | SB12 Round 1 | `v1.5-semantic-validation-candidate` | 2 DWG, 2 DOCX point-record revisions, 1 requirement PDF | **FAIL** |
 | SB12 Round 2 | `v1.5.1` | Same sources; P0 defect regression only | **PASS** |
-| SB12 Round 3 | v1.5.2 candidate (`v1.5.1` + P1 changes) | Same sources; P1 evidence-metadata regression; Round 2 fixes re-checked | **PASS** (17/17 checks) |
+| SB12 Round 3 | `v1.5.2` (`v1.5.1` + P1 changes) | Same sources; P1 evidence-metadata regression; Round 2 fixes re-checked | **PASS** (17/17 checks) |
 
 Review: Technical SELF-REVIEWED · Engineering semantic SELF-REVIEWED · Independent engineering approval NOT PERFORMED · Production Approval NOT APPROVED.
 
@@ -39,7 +39,7 @@ Not tested (source unavailable): IFC, BOQ, Clash.
 
 Round 2 also confirmed H0 = H1 = H2 for all sources and no other output change versus Round 1.
 
-## P1 evidence-metadata changes (v1.5.2 candidate)
+## P1 evidence-metadata changes (v1.5.2)
 
 | ID | Change | Round 3 evidence |
 | --- | --- | --- |

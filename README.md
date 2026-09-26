@@ -1,14 +1,14 @@
 # dwg_batch_tool
 
-目前版本：**SCADA Engineering Data Analyzer — Semantic Bugfix Baseline（`v1.5.1`）**。
+目前版本：**SCADA Engineering Data Analyzer — Evidence Metadata Quality（`v1.5.2`）**。
 人工工程核准與 Production Approval 均為 NOT APPROVED。
 
 | 項目 | 狀態 |
 | --- | --- |
-| 自動化測試 | 171/171 tests PASS |
-| Real project validation | SB12 Round 1 FAIL（v1.5）→ Round 2 PASS（P0 修正範圍，v1.5.1）；見 [docs/REAL_PROJECT_VALIDATION_STATUS.md](docs/REAL_PROJECT_VALIDATION_STATUS.md) |
+| 自動化測試 | 203/203 tests PASS |
+| Real project validation | SB12 Round 1 FAIL（v1.5）→ Round 2 PASS（P0 修正，v1.5.1）→ Round 3 PASS（P1 evidence metadata，v1.5.2）；見 [docs/REAL_PROJECT_VALIDATION_STATUS.md](docs/REAL_PROJECT_VALIDATION_STATUS.md) |
 | Production Approval | NOT APPROVED |
-| 版本標籤 | `v1.5.1`（前一版 `v1.5-semantic-validation-candidate`） |
+| 版本標籤 | `v1.5.2`（前版 `v1.5.1`、`v1.5-semantic-validation-candidate`） |
 
 功能擴充及 Retrieval／Ollama／Dify 整合維持暫停。正式狀態、真實資料驗收範圍與恢復條件見 [VERSION_STATUS.md](VERSION_STATUS.md)。
 
