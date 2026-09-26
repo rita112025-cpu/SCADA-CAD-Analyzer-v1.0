@@ -53,6 +53,19 @@ def _rm(p, tries=20):
             time.sleep(0.25)
 
 
+_MSGBOX = re.compile(r"\*{10,}MessageBox\*{10,}(.*?)\*{20,}", re.S)
+_BENIGN = re.compile(r"唯讀|read[- ]only|使用中", re.I)
+
+
+def _has_blocking_messagebox(text):
+    """A MessageBox means a stalled/corrupt DWG, except AutoCAD's own "file is read-only, open read-only?" prompt,
+    which accoreconsole answers itself ("Responding: Yes") and then continues normally."""
+    for m in _MSGBOX.finditer(text):
+        if not _BENIGN.search(m.group(1)):
+            return True
+    return "MessageBox" in _MSGBOX.sub("", text)
+
+
 def _decode(buf):
     data = bytes(buf)
     return data[: len(data) // 2 * 2].decode("utf-16-le", errors="replace")
@@ -121,7 +134,7 @@ def _run_launch(jobs, accore, cfg, timeout, stop_event, on_start, finalize, tmpd
             if stop_event is not None and stop_event.is_set():
                 stopped = True
                 break
-            if "MessageBox" in text[scan_from:]:
+            if _has_blocking_messagebox(text[scan_from:]):
                 fail_msg = "AutoCAD reported an error opening this DWG (invalid/corrupt file?)"
                 break
             if proc.poll() is not None:

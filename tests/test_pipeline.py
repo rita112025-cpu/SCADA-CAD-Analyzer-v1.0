@@ -152,3 +152,28 @@ def test_18_non_ansi_filename_uses_copy_and_source_untouched(cfg):
     before = sha(src)
     s = batch_convert.run(cfg)
     assert s["ok"] == 1 and sha(src) == before
+
+
+def test_19_read_only_dwg_is_converted_not_failed(cfg):
+    """A DWG with the read-only attribute makes AutoCAD ask 'open read-only?'; that must not be reported as corrupt."""
+    import os
+    import stat
+    inp = Path(cfg["input_dir"])
+    src = inp / "ro.dwg"
+    shutil.copy(FIXTURE, src)
+    os.chmod(src, stat.S_IREAD)
+    before = sha(src)
+    try:
+        s = batch_convert.run(cfg)
+        assert (s["ok"], s["failed"]) == (1, 0), s["failed_files"]
+        assert sha(src) == before
+    finally:
+        os.chmod(src, stat.S_IWRITE | stat.S_IREAD)
+
+
+def test_20_messagebox_classifier():
+    from convert_batch import _has_blocking_messagebox as f
+    stars = "*" * 24
+    ro = f"{stars}MessageBox{'*' * 20}\nAutoCAD 警告\nx.dwg 目前使用中或是唯讀。\n>>>Responding: Yes.\n{'*' * 30}\n"
+    bad = f"{stars}MessageBox{'*' * 20}\nAutoCAD 訊息\n圖檔無效。\n>>>Responding: OK.\n{'*' * 30}\n"
+    assert not f(ro) and f(bad) and f(ro + bad) and not f("no box here")
