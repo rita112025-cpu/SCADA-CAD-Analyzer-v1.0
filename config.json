@@ -1,0 +1,44 @@
+{
+  "input_dir": "input",
+  "output_dir": "output",
+  "recursive": true,
+  "overwrite": false,
+  "dxf_version": "2018",
+  "accoreconsole": "C:\\Program Files\\Autodesk\\AutoCAD 2027\\accoreconsole.exe",
+  "timeout_seconds": 300,
+  "keywords": [
+    "SCADA",
+    "RTU",
+    "UPS",
+    "SB12",
+    "RACK",
+    "NETWORK RACK",
+    "CABLE TRAY",
+    "TRAY",
+    "PANEL",
+    "PLC",
+    "MCC"
+  ],
+  "high_confidence_phrases": [
+    "SCADA PANEL",
+    "CONTROL PANEL",
+    "PLC PANEL",
+    "RTU PANEL",
+    "UPS PANEL",
+    "DDC PANEL",
+    "MCC PANEL"
+  ],
+  "exclude_phrases": [
+    "System Panel",
+    "Curtain Wall Panel",
+    "Curtain Panel",
+    "Architectural Panel",
+    "Glazed Panel"
+  ],
+  "generic_keywords": [
+    "PANEL"
+  ],
+  "engineering_suffix_keywords": [
+    "TRAY"
+  ]
+}

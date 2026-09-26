@@ -1,0 +1,191 @@
+"""Parse DXF files under output/dxf into CSV + JSON."""
+import csv
+import json
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import load_config, resolve, log_error
+
+import ezdxf
+import scada_rules
+
+
+def iter_layouts(doc):
+    for layout in doc.layouts:
+        yield layout
+    # non-layout block definitions also hold searchable text
+    for blk in doc.blocks:
+        if not blk.name.startswith("*") and not blk.is_any_layout:
+            yield blk
+
+
+def xyz(p):
+    try:
+        return round(p[0], 4), round(p[1], 4), round(p[2] if len(p) > 2 else 0.0, 4)
+    except Exception:  # noqa: BLE001
+        return "", "", ""
+
+
+_CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def text_quality(text):
+    """OK / EMPTY / SUSPECT_ENCODING. Text is never altered, only flagged.
+    Suspect = contains U+FFFD or control characters, or is made mostly (>= 50%) of '?'.
+    A normal sentence that merely contains a '?' is OK."""
+    if text is None or not str(text).strip():
+        return "EMPTY"
+    t = "".join(str(text).split())
+    if "�" in t or _CONTROL.search(str(text)):
+        return "SUSPECT_ENCODING"
+    if t.count("?") * 2 >= len(t):
+        return "SUSPECT_ENCODING"
+    return "OK"
+
+
+def mtext_plain(e):
+    try:
+        return e.plain_text()
+    except Exception:  # noqa: BLE001
+        return e.text
+
+
+def analyze(dxf_path, rel_name):
+    doc = ezdxf.readfile(str(dxf_path))
+    res = dict(layers=[], texts=[], blocks=[], dimensions=[], attribs=[], entity_types=Counter())
+    layer_count = Counter()
+    for layout in iter_layouts(doc):
+        in_block_def = not layout.is_any_layout
+        for e in layout:
+            t = e.dxftype()
+            res["entity_types"][t] += 1
+            layer = e.dxf.get("layer", "0")
+            layer_count[layer] += 1
+            h = e.dxf.get("handle", "")
+            ctx = f"BLOCKDEF:{layout.name}" if in_block_def else ""
+            if t in ("TEXT", "MTEXT"):
+                x, y, z = xyz(e.dxf.insert)
+                text = e.dxf.text if t == "TEXT" else mtext_plain(e)
+                res["texts"].append(dict(file=rel_name, layer=layer, entity_type=t, text=text,
+                                         x=x, y=y, z=z, rotation=e.dxf.get("rotation", 0),
+                                         handle=h, context=ctx, text_quality=text_quality(text)))
+            elif t == "INSERT":
+                x, y, z = xyz(e.dxf.insert)
+                res["blocks"].append(dict(
+                    file=rel_name, layer=layer, block_name=e.dxf.name, x=x, y=y, z=z,
+                    rotation=e.dxf.get("rotation", 0), xscale=e.dxf.get("xscale", 1),
+                    yscale=e.dxf.get("yscale", 1), zscale=e.dxf.get("zscale", 1),
+                    handle=h, context=ctx))
+                for a in e.attribs:
+                    ax, ay, az = xyz(a.dxf.insert)
+                    al = a.dxf.get("layer", layer)
+                    res["attribs"].append(dict(file=rel_name, layer=al, block_name=e.dxf.name,
+                                               tag=a.dxf.tag, text=a.dxf.text, x=ax, y=ay, z=az,
+                                               handle=a.dxf.get("handle", ""), parent_handle=h))
+                    res["texts"].append(dict(file=rel_name, layer=al, entity_type="ATTRIB",
+                                             text=a.dxf.text, x=ax, y=ay, z=az,
+                                             rotation=a.dxf.get("rotation", 0),
+                                             handle=a.dxf.get("handle", ""), context=f"tag={a.dxf.tag}",
+                                             text_quality=text_quality(a.dxf.text)))
+            elif t == "DIMENSION":
+                try:
+                    meas = round(e.get_measurement(), 4)
+                except Exception:  # noqa: BLE001
+                    meas = ""
+                res["dimensions"].append(dict(file=rel_name, layer=layer, dimtype=e.dimtype,
+                                              measurement=meas, text_override=e.dxf.get("text", ""),
+                                              handle=h))
+    for l in doc.layers:
+        res["layers"].append(dict(file=rel_name, layer=l.dxf.name, color=l.dxf.get("color", 7),
+                                  linetype=l.dxf.get("linetype", ""),
+                                  entity_count=layer_count.get(l.dxf.name, 0)))
+    info = dict(dxf_version=doc.dxfversion, entity_count=sum(res["entity_types"].values()),
+                layer_count=len(res["layers"]),
+                block_count=len([b for b in doc.blocks if not b.name.startswith("*")]),
+                text_count=len(res["texts"]))
+    return res, info
+
+
+def write_csv(path, rows, fields):
+    with open(path, "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fields, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+
+
+def run(cfg, write_csv_files=True, write_json_files=True, log=None, progress=None, stop_event=None):
+    """Analyze every DXF under output/dxf. Returns dict(total, ok, failed, stopped)."""
+    log = log or (lambda level, msg: print(f"[{level}] {msg}"))
+    progress = progress or (lambda i, n, cur: None)
+    out = resolve(cfg, "output_dir")
+    dxf_root = out / "dxf"
+    (out / "csv").mkdir(parents=True, exist_ok=True)
+    (out / "json").mkdir(parents=True, exist_ok=True)
+    idx, layers, texts, blocks, dims, attribs = [], [], [], [], [], []
+    files = sorted(dxf_root.rglob("*.dxf"))
+    rules = scada_rules.build_rules(cfg)
+    stats = dict(total=len(files), ok=0, failed=0, stopped=False, suspect=0, failed_files=[])
+    for n, p in enumerate(files, 1):
+        if stop_event is not None and stop_event.is_set():
+            stats["stopped"] = True
+            break
+        progress(n, len(files), str(p))
+        rel = str(p.relative_to(dxf_root))
+        src = str(resolve(cfg, "input_dir") / Path(rel).with_suffix(".dwg"))
+        row = dict(source_file=src, dxf_file=str(p), dxf_version="", entity_count=0, layer_count=0,
+                   block_count=0, text_count=0, status="")
+        try:
+            res, info = analyze(p, rel)
+            row.update(info, status="OK")
+            layers += res["layers"]
+            texts += res["texts"]
+            blocks += res["blocks"]
+            dims += res["dimensions"]
+            attribs += res["attribs"]
+            if write_json_files:
+                jp = out / "json" / Path(rel).with_suffix(".json")
+                jp.parent.mkdir(parents=True, exist_ok=True)
+                jp.write_text(json.dumps(dict(file=rel, index=info, entity_types=res["entity_types"],
+                                              layers=res["layers"], texts=res["texts"],
+                                              blocks=res["blocks"], attribs=res["attribs"],
+                                              dimensions=res["dimensions"]),
+                                         ensure_ascii=False, indent=1), encoding="utf-8")
+            stats["ok"] += 1
+            log("OK", f"analyzed {rel}")
+        except Exception as e:  # noqa: BLE001
+            row["status"] = f"ERROR: {type(e).__name__}: {e}"
+            log_error(cfg, f"analyze {p}: {row['status']}")
+            stats["failed"] += 1
+            stats["failed_files"].append(f"{rel}: {row['status']}")
+            log("ERROR", f"analyze {rel}: {row['status']}")
+        idx.append(row)
+    stats["suspect"] = sum(1 for t in texts if t["text_quality"] == "SUSPECT_ENCODING")
+    log("INFO", f"Suspect text records: {stats['suspect']}")
+    if write_csv_files:
+        c = out / "csv"
+        write_csv(c / "file_index.csv", idx, ["source_file", "dxf_file", "dxf_version", "entity_count",
+                                              "layer_count", "block_count", "text_count", "status"])
+        write_csv(c / "layers.csv", layers, ["file", "layer", "color", "linetype", "entity_count"])
+        write_csv(c / "texts.csv", texts, ["file", "layer", "entity_type", "text", "x", "y", "z",
+                                           "rotation", "handle", "context", "text_quality"])
+        write_csv(c / "blocks.csv", blocks, ["file", "layer", "block_name", "x", "y", "z", "rotation",
+                                             "xscale", "yscale", "zscale", "handle", "context"])
+        write_csv(c / "block_summary.csv", scada_rules.build_block_summary(blocks, rules, attribs),
+                  scada_rules.BLOCK_SUMMARY_FIELDS)
+        write_csv(c / "dimensions.csv", dims, ["file", "layer", "dimtype", "measurement",
+                                               "text_override", "handle"])
+        write_csv(c / "attribs.csv", attribs, ["file", "layer", "block_name", "tag", "text", "x", "y",
+                                               "z", "handle", "parent_handle"])
+    return stats
+
+
+def main(cfg=None):
+    s = run(cfg or load_config())
+    return 0 if s["failed"] == 0 else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
