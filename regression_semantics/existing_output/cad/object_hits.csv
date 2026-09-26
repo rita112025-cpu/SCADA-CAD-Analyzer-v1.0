@@ -1,0 +1,9 @@
+﻿file,source_type,handle,layer,block,text,x,y,z,confidence,matched_keywords,match_count,source_file,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,CAD,32,0,RTU-01,RTU-01,1.0,2.0,3.0,normal,RTU,1,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,32,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,CAD,34,0,,SCADA RTU PANEL,0.0,0.0,0.0,high_confidence,SCADA|RTU|RTU PANEL,3,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,34,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2D9,SCADA_TEST,,SCADA_TEST,,,,normal,SCADA,1,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2D9,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2DA,SCADA_TEST,,RTU-01 Panel,10.0,10.0,0.0,normal,RTU|PANEL,2,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DA,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2DB,SCADA_TEST,,"UPS SB12 RACK
+中文測試",20.0,30.0,0.0,normal,UPS|SB12|RACK,3,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DB,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2E3,SCADA_TEST,BLK_PLC,BLK_PLC,80.0,80.0,0.0,normal,PLC,1,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2E3,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2E5,SCADA_TEST,BLK_PLC,PLC-A1,80.0,80.0,0.0,normal,PLC,1,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2E5,PARSED

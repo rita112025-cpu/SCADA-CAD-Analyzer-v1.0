@@ -1,0 +1,5 @@
+﻿source_file,source_type,source_location,evidence_level,section,parent_section,level,kind,source_order,text,original_text
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:1,PARSED,Scope,,1,heading,1,Scope,Scope
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:2,PARSED,Scope / SCADA,Scope,2,heading,2,SCADA,SCADA
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:3,PARSED,Scope / SCADA,Scope / SCADA,0,paragraph,3,RTU shall retain source evidence.,RTU shall retain source evidence.
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:4,PARSED,Scope / SCADA,Scope / SCADA,0,paragraph,4,Cable Tray should be coordinated.,Cable Tray should be coordinated.

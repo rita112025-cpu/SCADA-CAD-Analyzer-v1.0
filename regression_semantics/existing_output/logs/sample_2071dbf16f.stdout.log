@@ -1,0 +1,39 @@
+Redirect stdout (file: C:\Users\user\AppData\Local\Temp\accc146282).
+AcCoreConsole: StdOutConsoleMode: processed-output: disabled,auto
+AutoCAD Core Engine Console - Copyright 2026 Autodesk, Inc.  All rights reserved. (X.118.0.0)
+
+Execution Path:
+C:\Program Files\Autodesk\AutoCAD 2027\accoreconsole.exe
+Current Directory: D:\github\ezdxf\dwg_batch_tool
+
+Version Number: X.118.0.0 (UNICODE)
+LogFilePath has been set to the working folder.
+CoreHeartBeat
+正在重生模型。
+
+**** 系統變數已變更 ****
+2 個受監視的系統變數已變更偏好值。使用 SYSVARMONITOR 指令以檢視變更。
+
+
+AutoCAD 功能表公用程式 已載入。
+指令:
+指令:
+
+指令:
+指令: FILEDIA
+
+輸入 FILEDIA 的新值 <0>: 0
+
+指令: _SAVEAS
+
+目前的檔案格式: AutoCAD 2018 圖檔
+輸入檔案格式 [R14(LT98&LT97)/2000(LT2000)/2004(LT2004)/2007(LT2007)/2010(LT2010)/2013(LT2013)/2018(LT2018)/標準(S)/DXF(DXF)/樣板(T)] <2018>: DXF
+
+目前的 DXF 設定: 精確度= 16 格式= ASCII 預覽= 否 版本= 2018
+
+輸入小數位數 (0 到 16) 或 [二進位(B)/選取物件(O)/預覽(P)/版本(V)] <16>:
+圖面另存成 <D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dxf>: D:/github/ezdxf/dwg_batch_tool/regression_semantics/existing_output/logs/tmp/2071dbf16f.dxf
+
+指令: _QUIT
+
+LogFilePath has been restored to ''.

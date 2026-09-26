@@ -1,0 +1,2 @@
+﻿file,layer,dimtype,measurement,text_override,handle,source_file,source_type,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,SCADA_TEST,0,100.0,,2E9,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2E9,PARSED

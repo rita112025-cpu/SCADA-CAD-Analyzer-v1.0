@@ -21,7 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import resolve, log_error, decode_console
-from convert_single import sha256, validate_dxf, safe_tmpdir, _terminate
+from convert_single import sha256, validate_dxf, safe_tmpdir, _terminate, publish_dxf
 
 OPEN_RE = re.compile(r"DWGBATCH_OPEN_(\d+)\|([^|\r\n]*)\|")
 DONE_RE = re.compile(r"DWGBATCH_DONE_(\d+)_")
@@ -230,7 +230,7 @@ def convert_many(items, accore, cfg, timeout=300, overwrite=False, stop_event=No
         else:
             for _ in range(retries):
                 try:
-                    os.replace(tmp, job["dxf"])
+                    publish_dxf(tmp, job["dxf"])
                     break
                 except PermissionError:
                     time.sleep(0.25)

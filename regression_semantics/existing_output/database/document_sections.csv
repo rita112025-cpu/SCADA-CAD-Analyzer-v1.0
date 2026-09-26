@@ -1,0 +1,17 @@
+﻿source_file,source_type,source_location,evidence_level,section_id,section,parent_section,heading,level,kind,source_order,page,text,original_text,cells_json
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\appendix.pdf,PDF,page:1,PARSED,,1. SCADA requirements,,,,section_candidate,,1,"1. SCADA requirements
+RTU shall connect to the UPS panel.
+",,
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:1,PARSED,,Equipment,,,,table_row,1,,,,"[""SYNTHETIC BOQ"", null, null, null, null]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:2,PARSED,,Equipment,,,,table_row,2,,,,"[""Item No."", ""Model"", ""Description"", ""Qty"", ""Unit""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:3,PARSED,,Equipment,,,,table_row,3,,,,"[""001"", ""RTU01"", ""Remote Terminal Unit"", 3, ""ea""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:4,PARSED,,Equipment,,,,table_row,4,,,,"[""002"", ""TRAY-X600"", ""Cable Tray"", 1, ""ea""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:1,PARSED,,Scope,,,1,heading,1,,Scope,Scope,
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:2,PARSED,,Scope / SCADA,Scope,,2,heading,2,,SCADA,SCADA,
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:3,PARSED,,Scope / SCADA,Scope / SCADA,,0,paragraph,3,,RTU shall retain source evidence.,RTU shall retain source evidence.,
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:4,PARSED,,Scope / SCADA,Scope / SCADA,,0,paragraph,4,,Cable Tray should be coordinated.,Cable Tray should be coordinated.,
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sow.docx,DOCX,body:5/table:1/row:1,PARSED,,Scope / SCADA,,,,table_row,5,,,,"[""UPS"", ""must be supplied""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:1,PARSED,,Equipment,,,,table_row,1,,,,"[""SYNTHETIC BOQ"", null, null, null, null]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:2,PARSED,,Equipment,,,,table_row,2,,,,"[""Item No."", ""Model"", ""Description"", ""Qty"", ""Unit""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:3,PARSED,,Equipment,,,,table_row,3,,,,"[""001"", ""RTU01"", ""Remote Terminal Unit"", 2, ""ea""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:4,PARSED,,Equipment,,,,table_row,4,,,,"[""002"", ""TRAY-X600"", ""Cable Tray"", 1, ""ea""]"

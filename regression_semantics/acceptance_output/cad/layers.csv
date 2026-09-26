@@ -1,0 +1,3 @@
+﻿file,layer,color,linetype,entity_count,source_file,source_type,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,0,7,Continuous,3,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,CAD,layers,PARSED
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,Defpoints,7,Continuous,0,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,CAD,layers,PARSED

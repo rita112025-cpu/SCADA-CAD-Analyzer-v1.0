@@ -33,6 +33,7 @@ class App:
         self.worker = None
         self.env_ok = False
         self.summary = None
+        self.analysis_inputs = []
 
         self.v_in = tk.StringVar(value=str(common.resolve(self.cfg, "input_dir")))
         self.v_out = tk.StringVar(value=str(common.resolve(self.cfg, "output_dir")))
@@ -52,8 +53,22 @@ class App:
     # ---------- layout ----------
     def _build(self):
         pad = dict(padx=8, pady=3)
-        main = ttk.Frame(self.root, padding=8)
-        main.pack(fill="both", expand=True)
+        # Keep the existing form accessible on small screens/high-DPI displays.
+        shell = ttk.Frame(self.root)
+        shell.pack(fill="both", expand=True)
+        self.form_canvas = tk.Canvas(shell, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(shell, orient='vertical', command=self.form_canvas.yview)
+        scrollbar.pack(side='right', fill='y')
+        self.form_canvas.pack(side='left', fill='both', expand=True)
+        self.form_canvas.configure(yscrollcommand=scrollbar.set)
+        main = ttk.Frame(self.form_canvas, padding=8)
+        window = self.form_canvas.create_window((0, 0), window=main, anchor='nw')
+        main.bind('<Configure>', lambda event: self.form_canvas.configure(scrollregion=self.form_canvas.bbox('all')))
+        self.form_canvas.bind('<Configure>', lambda event: self.form_canvas.itemconfigure(window, width=event.width))
+        def scroll(event):
+            if not isinstance(event.widget, (tk.Text, tk.Listbox)):
+                self.form_canvas.yview_scroll(-int(event.delta / 120), 'units')
+        self.root.bind('<MouseWheel>', scroll)
 
         env = ttk.LabelFrame(main, text="環境 Environment")
         env.pack(fill="x", **pad)
@@ -73,6 +88,25 @@ class App:
             ttk.Button(paths, text="Browse", command=lambda v=var: self._browse(v)).grid(
                 row=r, column=2, padx=6)
         paths.columnconfigure(1, weight=1)
+
+        data = ttk.LabelFrame(main, text="資料分析 · CAD / IFC / Excel / PDF / DOCX / Navisworks")
+        data.pack(fill="x", **pad)
+        self.v_analysis = tk.StringVar(value="使用上方輸入資料夾，或選擇多個檔案")
+        ttk.Label(data, textvariable=self.v_analysis, wraplength=700).grid(row=0, column=0, columnspan=3, sticky="w", padx=8, pady=4)
+        self.btn_files = ttk.Button(data, text="選擇檔案", command=self._select_analysis_files)
+        self.btn_files.grid(row=1, column=0, padx=8, pady=4, sticky="w")
+        self.btn_folder = ttk.Button(data, text="使用輸入資料夾", command=self._analysis_folder)
+        self.btn_folder.grid(row=1, column=1, padx=8, pady=4, sticky="w")
+        self.btn_analysis = ttk.Button(data, text="分析工程資料", command=self._start_analysis)
+        self.btn_analysis.grid(row=1, column=2, padx=8, pady=4, sticky="w")
+        self.analysis_outputs = {}
+        for i, rel in enumerate(('database/project.db', 'cross_reference/cross_reference.csv', 'docx/requirements.csv', 'excel/boq_items.csv', 'ifc/ifc_objects.csv', 'navisworks/navis_clashes.csv')):
+            button = ttk.Button(data, text="開啟 " + Path(rel).name, command=lambda r=rel: self._open(r), state="disabled")
+            button.grid(row=2+i//3, column=i%3, sticky="ew", padx=8, pady=3)
+            self.analysis_outputs[rel] = button
+        for col in range(3): data.columnconfigure(col, weight=1)
+        self.v_out.trace_add('write', lambda *args: self._refresh_analysis_outputs())
+        self._refresh_analysis_outputs()
 
         op = ttk.LabelFrame(main, text="處理選項 Processing")
         op.pack(fill="x", **pad)
@@ -125,6 +159,58 @@ class App:
             ttk.Button(bf, text=text, command=lambda r=rel: self._open(r)).pack(side="left", padx=4)
 
     # ---------- helpers ----------
+    def _select_analysis_files(self):
+        paths = filedialog.askopenfilenames(title="選擇工程資料", filetypes=[("工程資料", "*.dwg *.dxf *.ifc *.xlsx *.xlsm *.csv *.pdf *.docx *.xml *.html"), ("所有檔案", "*.*")])
+        if paths:
+            self.analysis_inputs = list(paths)
+            self.v_analysis.set(f"已選擇 {len(paths)} 個檔案")
+
+    def _analysis_folder(self):
+        self.analysis_inputs = []
+        self.v_analysis.set("使用上方輸入資料夾")
+
+    def _refresh_analysis_outputs(self):
+        for rel, button in self.analysis_outputs.items():
+            button.configure(state="normal" if (Path(self.v_out.get()) / rel).is_file() and not self._busy() else "disabled")
+
+    def _start_analysis(self):
+        if self._busy(): return
+        cfg = self._current_cfg()
+        cfg['recursive'] = self.opts['recursive'].get()
+        inputs = self.analysis_inputs or [cfg['input_dir']]
+        if not cfg['output_dir'] or any(not Path(p).exists() for p in inputs):
+            messagebox.showerror("路徑錯誤", "請選擇存在的輸入檔案／資料夾，並指定輸出資料夾。")
+            return
+        self.stop_event.clear()
+        self.summary = None
+        self.v_result.set("分析中...")
+        self.v_progress.set(0)
+        for b in (self.btn_start, self.btn_scan, self.btn_analysis, self.btn_files, self.btn_folder): b.configure(state="disabled")
+        self.btn_stop.configure(state="normal")
+        def work():
+            try:
+                result = pipeline.run_pipeline(cfg, dict(multiformat=True, inputs=inputs),
+                    log=lambda lv, msg: self.q.put(('log', lv, msg)),
+                    progress=lambda *args: self.q.put(('progress', *args)), stop_event=self.stop_event)
+                self.q.put(('analysis_done', result))
+            except Exception as exc:
+                common.log_error(cfg, f'multiformat: {type(exc).__name__}: {exc}')
+                self.q.put(('analysis_done', dict(fatal=str(exc), total=0, ok=0, failed=0, warnings=0, stopped=False)))
+        self.worker = threading.Thread(target=work, daemon=True)
+        self.worker.start()
+        self._refresh_analysis_outputs()
+
+    def _analysis_done(self, result):
+        self.summary = result
+        self.worker = None
+        for b in (self.btn_scan, self.btn_analysis, self.btn_files, self.btn_folder): b.configure(state="normal")
+        self.btn_start.configure(state="normal" if self.env_ok else "disabled")
+        self.btn_stop.configure(state="disabled")
+        head = '處理中止' if result['fatal'] else ('已停止' if result['stopped'] else ('Completed with warnings' if result['failed'] or result['warnings'] else '分析完成'))
+        self.v_result.set(f"{head}\n檔案：{result['total']}　成功：{result['ok']}　失敗：{result['failed']}　需檢視：{result['warnings']}\n" + result['fatal'])
+        self.v_progress.set(100 if not result['stopped'] else self.v_progress.get())
+        self._refresh_analysis_outputs()
+
     def _browse(self, var):
         d = filedialog.askdirectory(initialdir=var.get() or str(ROOT))
         if d:
@@ -256,6 +342,7 @@ class App:
         self.btn_start.configure(state="disabled")
         self.btn_scan.configure(state="disabled")
         self.btn_stop.configure(state="normal")
+        self.btn_analysis.configure(state="disabled")
         self.v_progress.set(0)
         self.v_ptext.set("")
         self.v_result.set("處理中...")
@@ -284,6 +371,7 @@ class App:
         self.summary = s
         self.btn_scan.configure(state="normal")
         self.btn_stop.configure(state="disabled")
+        self.btn_analysis.configure(state="normal")
         self.btn_start.configure(state="normal" if self.env_ok else "disabled")
         if s["fatal"]:
             head = "處理中止（嚴重錯誤）"
@@ -322,6 +410,8 @@ class App:
                     self.v_current.set(f"目前處理：{cur}")
                 elif k == "done":
                     self._on_done(m[1])
+                elif k == 'analysis_done':
+                    self._analysis_done(m[1])
                 elif k == "env_paths":
                     self._on_env_paths(m[1], m[2])
                 elif k == "env":

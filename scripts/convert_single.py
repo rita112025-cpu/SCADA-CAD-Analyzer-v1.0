@@ -10,6 +10,8 @@ Verified behaviour (AutoCAD 2027 accoreconsole):
 """
 import hashlib
 import os
+import errno
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -64,8 +66,9 @@ def _script_safe(p):
 def safe_tmpdir(logs):
     """A temp folder whose path is ASCII and has no spaces: the SAVEAS filename prompt splits on
     spaces and the script is read with the ANSI code page, so the temp target must be plain."""
-    cands = [logs / "tmp", Path(tempfile.gettempdir()) / "dwg_batch_tool",
-             Path(os.environ.get("PUBLIC", r"C:\Users\Public")) / "dwg_batch_tool"]
+    token = hashlib.sha256(str(Path(logs).resolve()).encode()).hexdigest()[:16]
+    cands = [logs / "tmp", Path(tempfile.gettempdir()) / "dwg_batch_tool" / token,
+             Path(os.environ.get("PUBLIC", r"C:\Users\Public")) / "dwg_batch_tool" / token]
     for c in cands:
         try:
             c.mkdir(parents=True, exist_ok=True)
@@ -75,6 +78,22 @@ def safe_tmpdir(logs):
             if _script_safe(form) and os.access(form, os.W_OK):
                 return form
     raise OSError("no script-safe temp folder (ASCII, no spaces) available")
+
+
+def publish_dxf(source, destination):
+    """Publish on the destination volume, including cross-drive temporary files."""
+    try:
+        os.replace(source, destination)
+    except OSError as exc:
+        if exc.errno != errno.EXDEV and getattr(exc, 'winerror', None) != 17:
+            raise
+        staging = Path(destination).with_name(Path(destination).name + '.' + uuid.uuid4().hex + '.tmp')
+        try:
+            shutil.copyfile(source, staging)
+            os.replace(staging, destination)
+            Path(source).unlink()
+        finally:
+            staging.unlink(missing_ok=True)
 
 
 def _terminate(proc):
@@ -171,7 +190,7 @@ def convert(dwg, dxf, accore, cfg=None, timeout=300, overwrite=False, stop_event
             elif tmp_dxf.stat().st_size == 0:
                 rec["error"] = "DXF is 0 bytes"
         if not rec["error"]:
-            os.replace(tmp_dxf, dxf)
+            publish_dxf(tmp_dxf, dxf)
             status, detail = validate_dxf(dxf)
             rec["status"] = status
             rec["error"] = detail

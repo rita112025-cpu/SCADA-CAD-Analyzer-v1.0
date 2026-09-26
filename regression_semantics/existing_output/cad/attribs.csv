@@ -1,0 +1,2 @@
+﻿file,layer,block_name,tag,text,x,y,z,handle,parent_handle,source_file,source_type,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,SCADA_TEST,BLK_PLC,TAG1,PLC-A1,80.0,80.0,0.0,2E5,2E3,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,2E5,PARSED

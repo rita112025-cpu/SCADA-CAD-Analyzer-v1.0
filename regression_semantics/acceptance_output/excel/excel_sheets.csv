@@ -1,0 +1,2 @@
+﻿source_file,source_type,source_location,evidence_level,sheet,header_row,is_boq,items
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV,PARSED,CSV,1,True,4

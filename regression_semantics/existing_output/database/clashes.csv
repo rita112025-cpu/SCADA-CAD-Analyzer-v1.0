@@ -1,0 +1,2 @@
+﻿source_file,source_type,source_location,evidence_level,clash_id,clash_name,discipline_a,discipline_b,object_a,object_b,status,distance,x,y,z,path_a,path_b,properties_json,created_date,updated_date,object_a_type,object_b_type,object_a_source,object_b_source
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\clashes.xml,Navisworks,clash:1,PARSED,c1,Synthetic clash,,,0ud2j8XaT85uThpsZC_9gl,RTU-01,new,-0.1,1,2,3,,,"[{""GUID"": ""0ud2j8XaT85uThpsZC_9gl""}, {}]",,,GUID,NAME,,

@@ -1,0 +1,5 @@
+﻿source_file,source_type,source_location,evidence_level,sheet,row_number,item_no,description,model,specification,quantity,unit,unit_price,amount,revision,remarks,system,location,station,floor,raw_name,normalized_name
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:3,PARSED,Equipment,3,001,Remote Terminal Unit,RTU01,,3.0,ea,,,,,,,,,RTU01,RTU01
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:4,PARSED,Equipment,4,002,Cable Tray,TRAY-X600,,1.0,ea,,,,,,,,,TRAY-X600,TRAYX600
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:3,PARSED,Equipment,3,001,Remote Terminal Unit,RTU01,,2.0,ea,,,,,,,,,RTU01,RTU01
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:4,PARSED,Equipment,4,002,Cable Tray,TRAY-X600,,1.0,ea,,,,,,,,,TRAY-X600,TRAYX600

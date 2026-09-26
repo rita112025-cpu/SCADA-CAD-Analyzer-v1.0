@@ -1,0 +1,4 @@
+﻿file,keyword,source_type,layer,block,text,x,y,z,handle,confidence,source_file,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,UPS,CAD,0,UPS-01,UPS-01,1.0,2.0,3.0,32,normal,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,32,PARSED
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,RTU,CAD,0,RTU-01,RTU-01,1.0,2.0,3.0,38,normal,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,38,PARSED
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,RACK,CAD,0,RACK02,RACK02,1.0,2.0,3.0,3D,normal,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,3D,PARSED

@@ -1,0 +1,5 @@
+﻿source_file,source_type,source_location,evidence_level,page,section,text_excerpt,keyword
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\appendix.pdf,PDF,page:1,PARSED,1,1. SCADA requirements,1. SCADA requirements,SCADA
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\appendix.pdf,PDF,page:1,PARSED,1,1. SCADA requirements,RTU shall connect to the UPS panel.,RTU
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\appendix.pdf,PDF,page:1,PARSED,1,1. SCADA requirements,RTU shall connect to the UPS panel.,UPS
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\appendix.pdf,PDF,page:1,PARSED,1,1. SCADA requirements,RTU shall connect to the UPS panel.,UPS PANEL

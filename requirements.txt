@@ -1,1 +1,7 @@
 ezdxf
+openpyxl>=3.1
+pandas>=2.2
+PyMuPDF>=1.24
+python-docx>=1.1
+# Optional IFC parser: pip install -r requirements-ifc.txt
+# pdfplumber evaluated; not required because PyMuPDF supplies text evidence.

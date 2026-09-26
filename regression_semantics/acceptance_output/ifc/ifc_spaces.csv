@@ -1,0 +1,2 @@
+﻿source_file,source_type,source_location,evidence_level,object_id,object_type,name,tag,guid,level,space,system,x,y,z,width,height,length,boq_compare_eligible,comparison_role,specification,properties_json
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,#2,PARSED,2,IfcSpace,Equipment Room,,3vCDDt05T5RB0qnn0tjugN,,,,,,,,,,False,REFERENCE_ONLY,,"{""ObjectType"": null, ""Tag"": null, ""property_sets"": {}, ""relationships"": [], ""coordinate_units"": ""IFC project units""}"

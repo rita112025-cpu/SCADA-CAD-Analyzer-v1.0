@@ -1,0 +1,4 @@
+﻿file,block_name,layer,count,first_x,first_y,first_z,scada_related,scada_related_by,source_file,source_type,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,RACK02,0,1,1.0,2.0,3.0,true,block_name,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,CAD,,PARSED
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,RTU-01,0,1,1.0,2.0,3.0,true,block_name,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,CAD,,PARSED
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,UPS-01,0,1,1.0,2.0,3.0,true,block_name,D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,CAD,,PARSED

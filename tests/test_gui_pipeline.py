@@ -23,16 +23,6 @@ def sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
-@pytest.fixture(scope="module")
-def tk_root():
-    """One Tk root for the whole module: creating/destroying several roots in one process makes
-    Tcl intermittently fail to find its library files on this machine."""
-    tk = pytest.importorskip("tkinter")
-    root = tk.Tk()
-    yield root
-    root.destroy()
-
-
 def _fresh(root):
     for w in root.winfo_children():
         w.destroy()

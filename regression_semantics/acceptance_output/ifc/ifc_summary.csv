@@ -1,0 +1,11 @@
+﻿source_file,source_type,source_location,evidence_level,metric,value,count
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,total,objects,3
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,class,IfcDistributionSystem,1
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,level,,3
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,system,,3
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,missing,Name,0
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,missing,Tag,3
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,missing,System,3
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,total,Cable Tray,0
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,class,IfcCableCarrierSegment,1
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,,PARSED,class,IfcSpace,1

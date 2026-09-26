@@ -1,0 +1,9 @@
+﻿source_file,source_type,source_location,evidence_level,section_id,section,parent_section,heading,level,kind,source_order,page,text,original_text,cells_json
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:1,PARSED,,CSV,,,,table_row,1,,,,"[""Item"", ""Model"", ""Specification"", ""Qty""]"
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:2,PARSED,,CSV,,,,table_row,2,,,,"[""1"", ""UPS-01"", ""Voltage: 110 V"", ""1""]"
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:3,PARSED,,CSV,,,,table_row,3,,,,"[""2"", ""RTU01"", """", ""1""]"
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:4,PARSED,,CSV,,,,table_row,4,,,,"[""3"", ""RACK01"", """", ""1""]"
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:5,PARSED,,CSV,,,,table_row,5,,,,"[""4"", ""UNLISTED"", """", ""1""]"
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\sow.docx,DOCX,body:1,PARSED,,SCADA supply,,,1,heading,1,,SCADA supply,SCADA supply,
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\sow.docx,DOCX,body:2/table:1/row:1,PARSED,,SCADA supply,,,,table_row,2,,,,"[""Equipment"", ""Requirement""]"
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\sow.docx,DOCX,body:2/table:1/row:2,PARSED,,SCADA supply,,,,table_row,2,,,,"[""UPS"", ""must be supplied""]"

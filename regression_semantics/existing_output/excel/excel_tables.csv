@@ -1,0 +1,9 @@
+﻿source_file,source_type,source_location,evidence_level,section,kind,source_order,cells_json
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:1,PARSED,Equipment,table_row,1,"[""SYNTHETIC BOQ"", null, null, null, null]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:2,PARSED,Equipment,table_row,2,"[""Item No."", ""Model"", ""Description"", ""Qty"", ""Unit""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:3,PARSED,Equipment,table_row,3,"[""001"", ""RTU01"", ""Remote Terminal Unit"", 3, ""ea""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\boq.xlsx,Excel,Equipment!row:4,PARSED,Equipment,table_row,4,"[""002"", ""TRAY-X600"", ""Cable Tray"", 1, ""ea""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:1,PARSED,Equipment,table_row,1,"[""SYNTHETIC BOQ"", null, null, null, null]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:2,PARSED,Equipment,table_row,2,"[""Item No."", ""Model"", ""Description"", ""Qty"", ""Unit""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:3,PARSED,Equipment,table_row,3,"[""001"", ""RTU01"", ""Remote Terminal Unit"", 2, ""ea""]"
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\old_boq.xlsx,Excel,Equipment!row:4,PARSED,Equipment,table_row,4,"[""002"", ""TRAY-X600"", ""Cable Tray"", 1, ""ea""]"

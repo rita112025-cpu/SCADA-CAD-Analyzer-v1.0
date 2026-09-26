@@ -1,0 +1,5 @@
+﻿source_file,source_type,source_location,evidence_level,sheet,row_number,item_no,model,specification,quantity,unit_price,amount,raw_name,normalized_name
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:2,PARSED,CSV,2,1,UPS-01,Voltage: 110 V,1.0,,,UPS-01,UPS01
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:3,PARSED,CSV,3,2,RTU01,,1.0,,,RTU01,RTU01
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:4,PARSED,CSV,4,3,RACK01,,1.0,,,RACK01,RACK01
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\boq.csv,Excel,CSV!row:5,PARSED,CSV,5,4,UNLISTED,,1.0,,,UNLISTED,UNLISTED

@@ -1,0 +1,6 @@
+﻿file,layer,color,linetype,entity_count,source_file,source_type,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,0,7,Continuous,2,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,CAD,layers,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,Defpoints,7,Continuous,0,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,CAD,layers,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,0,7,Continuous,0,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,layers,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,SCADA_TEST,7,Continuous,8,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,layers,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,Defpoints,7,Continuous,0,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,CAD,layers,PARSED

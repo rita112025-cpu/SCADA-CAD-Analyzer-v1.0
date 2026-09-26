@@ -1,0 +1,2 @@
+﻿source_file,source_type,source_location,evidence_level,object_id,object_type,name,tag,guid,level,space,system,x,y,z,width,height,length,boq_compare_eligible,comparison_role,specification,properties_json
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\model.ifc,IFC,#3,PARSED,3,IfcDistributionSystem,SCADA,,1xONWmPpjBP8WNgn28oRYR,,,,,,,,,,False,REFERENCE_ONLY,,"{""ObjectType"": null, ""Tag"": null, ""property_sets"": {}, ""relationships"": [], ""coordinate_units"": ""IFC project units""}"

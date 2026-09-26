@@ -1,0 +1,12 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('ViewDefinition [CoordinationView]'),'2;1');
+FILE_NAME('','2026-09-26T21:01:08',(''),(''),'IfcOpenShell 0.8.5-1c5b825','IfcOpenShell 0.8.5-1c5b825','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCCABLECARRIERSEGMENT('0AbCdEfGhIjKlMnOpQrStU',$,'Tray-01',$,$,$,$,$,$);
+#2=IFCSPACE('3vCDDt05T5RB0qnn0tjugN',$,'Equipment Room',$,$,$,$,$,$,$,$);
+#3=IFCDISTRIBUTIONSYSTEM('1xONWmPpjBP8WNgn28oRYR',$,'SCADA',$,$,$,$);
+ENDSEC;
+END-ISO-10303-21;

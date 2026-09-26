@@ -1,0 +1,16 @@
+﻿file,keyword,source_type,layer,block,text,x,y,z,handle,confidence,source_file,source_location,evidence_level
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,RTU,CAD,0,RTU-01,RTU-01,1.0,2.0,3.0,32,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,32,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,SCADA,CAD,0,,SCADA RTU PANEL,0.0,0.0,0.0,34,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,34,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,RTU,CAD,0,,SCADA RTU PANEL,0.0,0.0,0.0,34,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,34,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,RTU PANEL,CAD,0,,SCADA RTU PANEL,0.0,0.0,0.0,34,high_confidence,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\drawing.dxf,34,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,SCADA,CAD,SCADA_TEST,,SCADA_TEST,,,,2D9,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2D9,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,RTU,CAD,SCADA_TEST,,RTU-01 Panel,10.0,10.0,0.0,2DA,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DA,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,PANEL,CAD,SCADA_TEST,,RTU-01 Panel,10.0,10.0,0.0,2DA,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DA,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,UPS,CAD,SCADA_TEST,,"UPS SB12 RACK
+中文測試",20.0,30.0,0.0,2DB,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DB,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,SB12,CAD,SCADA_TEST,,"UPS SB12 RACK
+中文測試",20.0,30.0,0.0,2DB,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DB,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,RACK,CAD,SCADA_TEST,,"UPS SB12 RACK
+中文測試",20.0,30.0,0.0,2DB,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2DB,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,PLC,CAD,SCADA_TEST,BLK_PLC,BLK_PLC,80.0,80.0,0.0,2E3,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2E3,PARSED
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,PLC,CAD,SCADA_TEST,BLK_PLC,PLC-A1,80.0,80.0,0.0,2E5,normal,D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\sample.dwg,2E5,PARSED

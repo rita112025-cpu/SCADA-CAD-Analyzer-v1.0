@@ -1,0 +1,1291 @@
+{
+  "audited_at": "2026-09-26T09:07:47.415162+00:00",
+  "scope": "Existing synthetic demo only; not real project acceptance",
+  "database": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\output\\database\\project.db",
+  "database_sha256": "f0257b473fa9d371227ba9836dadcdcc55da7244612b737b3403c408059e67b5",
+  "table_counts": {
+    "project_files": 8,
+    "engineering_objects": 9,
+    "requirements": 3,
+    "boq_items": 4,
+    "documents": 5,
+    "document_sections": 14,
+    "clashes": 1,
+    "cross_reference_results": 18
+  },
+  "source_checks": [
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+      "source_type": "PDF",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "d2aee8cadcd8acb60207c7cc943e81a693970cff4da197e89598e1d70626294d",
+      "file_hash": "ae4ab65f9857bad874da857fb79f1ccd57964f1c6990f3bbe54e2b93a8c42777",
+      "parsed_at": "2026-09-26T09:01:08.217307+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "ae4ab65f9857bad874da857fb79f1ccd57964f1c6990f3bbe54e2b93a8c42777",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\boq.xlsx",
+      "source_type": "XLSX",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "a94214c239229b45039f9fba6cc0bd2707d54664a5e21bda1a4f0afcd11106f1",
+      "file_hash": "5c5994554be87cec5fff191dae6f1912539d9eabeddc33baaa00f81c788cef3b",
+      "parsed_at": "2026-09-26T09:01:08.426232+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "5c5994554be87cec5fff191dae6f1912539d9eabeddc33baaa00f81c788cef3b",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+      "source_type": "XML",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "6728fdeedb906e0088800992f7e2308a80140fc227bee89ea7a1a891ba5d9d86",
+      "file_hash": "c9fcf540de699c73840654daa745191256aa527c72ddfdf9f1e8f07a54491c1b",
+      "parsed_at": "2026-09-26T09:01:08.433315+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "c9fcf540de699c73840654daa745191256aa527c72ddfdf9f1e8f07a54491c1b",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_type": "DXF",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "7d92bd37c810bbf781dc6a277b1dfc75006104496957bc6a1f8d3832885b1d50",
+      "file_hash": "031100f176d927a26f26d2b05051496a5dfd3504df0f54f280037431f932e682",
+      "parsed_at": "2026-09-26T09:01:08.469617+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "031100f176d927a26f26d2b05051496a5dfd3504df0f54f280037431f932e682",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_type": "IFC",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "237a6ce3430b7d642524a0f46f28b7bd2ba4ad9a99dcf87f849689d4c80f2b50",
+      "file_hash": "8d76542ed22a0efea6e346b9adcaf9bb1125a85ce653e5b24754f7875edb2442",
+      "parsed_at": "2026-09-26T09:01:08.576662+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "8d76542ed22a0efea6e346b9adcaf9bb1125a85ce653e5b24754f7875edb2442",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "DWG",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "3b2cee54c20d1704ca593835c3d8c75e54b480becd7de34c8fbfdcb1fbd03dee",
+      "file_hash": "8fc573316777da0454a327a352861f5d0e82e5c00f8b5f0be2bebf582f6a0dad",
+      "parsed_at": "2026-09-26T09:01:10.239797+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "8fc573316777da0454a327a352861f5d0e82e5c00f8b5f0be2bebf582f6a0dad",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+      "source_type": "DOCX",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "fb228bcd90bdde3d670c46d6da4f457d55d24ca2eb043b27b1c2d16aff2be05f",
+      "file_hash": "5dbcb9ac1966c4ebce4a580605bf0d4ea6ef218e0fc3f657db4113f0df7d2f88",
+      "parsed_at": "2026-09-26T09:01:10.278279+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "5dbcb9ac1966c4ebce4a580605bf0d4ea6ef218e0fc3f657db4113f0df7d2f88",
+      "hash_matches": true
+    },
+    {
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\old_boq.xlsx",
+      "source_type": "XLSX",
+      "source_location": "",
+      "evidence_level": "PARSED",
+      "file_id": "a5d36314b7c2d068ea52567e9780c8e3d64e941bb418cb1e5a03d48143f893a3",
+      "file_hash": "b4c3ad7645f149d47c88e60bb1b014a14c6a659daab7800706c1dcd93f548e59",
+      "parsed_at": "2026-09-26T09:01:10.290289+00:00",
+      "status": "OK",
+      "error": "",
+      "current_hash": "b4c3ad7645f149d47c88e60bb1b014a14c6a659daab7800706c1dcd93f548e59",
+      "hash_matches": true
+    }
+  ],
+  "csv_database_checks": [
+    {
+      "path": "database/project_files.csv",
+      "rows": 8,
+      "matches": true
+    },
+    {
+      "path": "database/engineering_objects.csv",
+      "rows": 9,
+      "matches": true
+    },
+    {
+      "path": "database/requirements.csv",
+      "rows": 3,
+      "matches": true
+    },
+    {
+      "path": "database/boq_items.csv",
+      "rows": 4,
+      "matches": true
+    },
+    {
+      "path": "database/documents.csv",
+      "rows": 5,
+      "matches": true
+    },
+    {
+      "path": "database/document_sections.csv",
+      "rows": 14,
+      "matches": true
+    },
+    {
+      "path": "database/clashes.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "database/cross_reference_results.csv",
+      "rows": 18,
+      "matches": true
+    },
+    {
+      "path": "cad/attribs.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "cad/block_summary.csv",
+      "rows": 2,
+      "matches": true
+    },
+    {
+      "path": "cad/blocks.csv",
+      "rows": 2,
+      "matches": true
+    },
+    {
+      "path": "cad/dimensions.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "cad/file_index.csv",
+      "rows": 2,
+      "matches": true
+    },
+    {
+      "path": "cad/layers.csv",
+      "rows": 5,
+      "matches": true
+    },
+    {
+      "path": "cad/object_hits.csv",
+      "rows": 7,
+      "matches": true
+    },
+    {
+      "path": "cad/scada_hits.csv",
+      "rows": 12,
+      "matches": true
+    },
+    {
+      "path": "cad/texts.csv",
+      "rows": 4,
+      "matches": true
+    },
+    {
+      "path": "cross_reference/cross_reference.csv",
+      "rows": 18,
+      "matches": true
+    },
+    {
+      "path": "docx/docx_sections.csv",
+      "rows": 4,
+      "matches": true
+    },
+    {
+      "path": "docx/docx_tables.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "docx/requirements.csv",
+      "rows": 3,
+      "matches": true
+    },
+    {
+      "path": "excel/boq_compare.csv",
+      "rows": 2,
+      "matches": true
+    },
+    {
+      "path": "excel/boq_items.csv",
+      "rows": 4,
+      "matches": true
+    },
+    {
+      "path": "excel/boq_summary.csv",
+      "rows": 2,
+      "matches": true
+    },
+    {
+      "path": "excel/excel_sheets.csv",
+      "rows": 2,
+      "matches": true
+    },
+    {
+      "path": "excel/excel_tables.csv",
+      "rows": 8,
+      "matches": true
+    },
+    {
+      "path": "ifc/ifc_objects.csv",
+      "rows": 3,
+      "matches": true
+    },
+    {
+      "path": "ifc/ifc_spaces.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "ifc/ifc_summary.csv",
+      "rows": 10,
+      "matches": true
+    },
+    {
+      "path": "ifc/ifc_systems.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "navisworks/navis_clashes.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "navisworks/navis_summary.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "pdf/pdf_hits.csv",
+      "rows": 4,
+      "matches": true
+    },
+    {
+      "path": "pdf/pdf_pages.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "pdf/pdf_sections.csv",
+      "rows": 1,
+      "matches": true
+    },
+    {
+      "path": "pdf/pdf_summary.csv",
+      "rows": 1,
+      "matches": true
+    }
+  ],
+  "evidence_chains": [
+    {
+      "kind": "CAD",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+        "handle": "32",
+        "name": "RTU-01",
+        "position": [
+          1.0,
+          2.0,
+          3.0
+        ]
+      },
+      "parsed": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+        "layer": "0",
+        "block_name": "RTU-01",
+        "x": "1.0",
+        "y": "2.0",
+        "z": "3.0",
+        "rotation": "0",
+        "xscale": "1",
+        "yscale": "1",
+        "zscale": "1",
+        "handle": "32",
+        "context": "",
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+        "source_type": "CAD",
+        "source_location": "32",
+        "evidence_level": "PARSED"
+      },
+      "normalized": {
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+        "source_type": "CAD",
+        "source_location": "32",
+        "evidence_level": "PARSED",
+        "object_id": "7d92bd37c810:32",
+        "object_type": "INSERT",
+        "name": "RTU-01",
+        "properties_json": "{\"file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"layer\": \"0\", \"block_name\": \"RTU-01\", \"x\": 1.0, \"y\": 2.0, \"z\": 3.0, \"rotation\": 0, \"xscale\": 1, \"yscale\": 1, \"zscale\": 1, \"handle\": \"32\", \"context\": \"\"}",
+        "layer": "0",
+        "handle": "32",
+        "x": 1.0,
+        "y": 2.0,
+        "z": 3.0,
+        "context": "",
+        "raw_name": "RTU-01",
+        "normalized_name": "RTU01"
+      }
+    },
+    {
+      "kind": "BOQ",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\boq.xlsx",
+        "location": "Equipment!row:3",
+        "values": [
+          "001",
+          "RTU01",
+          "Remote Terminal Unit",
+          3,
+          "ea"
+        ]
+      },
+      "parsed": {
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\boq.xlsx",
+        "source_type": "Excel",
+        "source_location": "Equipment!row:3",
+        "evidence_level": "PARSED",
+        "sheet": "Equipment",
+        "row_number": "3",
+        "item_no": "001",
+        "model": "RTU01",
+        "description": "Remote Terminal Unit",
+        "quantity": "3.0",
+        "unit": "ea",
+        "unit_price": "",
+        "amount": "",
+        "raw_name": "RTU01",
+        "normalized_name": "RTU01"
+      },
+      "normalized": {
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\boq.xlsx",
+        "source_type": "Excel",
+        "source_location": "Equipment!row:3",
+        "evidence_level": "PARSED",
+        "sheet": "Equipment",
+        "row_number": 3,
+        "item_no": "001",
+        "model": "RTU01",
+        "description": "Remote Terminal Unit",
+        "quantity": 3.0,
+        "unit": "ea",
+        "unit_price": "",
+        "amount": "",
+        "raw_name": "RTU01",
+        "normalized_name": "RTU01"
+      }
+    },
+    {
+      "kind": "IFC",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+        "location": "#2",
+        "info": {
+          "id": 2,
+          "type": "IfcDistributionSystem",
+          "GlobalId": "0o5iGJ8uj1HuutdlTYAjfk",
+          "OwnerHistory": null,
+          "Name": "SCADA",
+          "Description": null,
+          "ObjectType": null,
+          "LongName": null,
+          "PredefinedType": null
+        },
+        "assignments": 0
+      },
+      "normalized": {
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+        "source_type": "IFC",
+        "source_location": "#2",
+        "evidence_level": "PARSED",
+        "object_id": "2",
+        "object_type": "IfcDistributionSystem",
+        "name": "SCADA",
+        "guid": "0o5iGJ8uj1HuutdlTYAjfk",
+        "level": "",
+        "space": "",
+        "system": "",
+        "x": "",
+        "y": "",
+        "z": "",
+        "properties_json": "{\"ObjectType\": null, \"Tag\": \"\", \"property_sets\": {}, \"relationships\": [], \"coordinate_units\": \"IFC project units\"}",
+        "raw_name": "SCADA",
+        "normalized_name": "SCADA"
+      }
+    },
+    {
+      "kind": "IFC",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+        "location": "#1",
+        "info": {
+          "id": 1,
+          "type": "IfcCableCarrierSegment",
+          "GlobalId": "0ud2j8XaT85uThpsZC_9gl",
+          "OwnerHistory": null,
+          "Name": "TRAY_X600",
+          "Description": null,
+          "ObjectType": null,
+          "ObjectPlacement": null,
+          "Representation": null,
+          "Tag": null,
+          "PredefinedType": "CABLETRAYSEGMENT"
+        },
+        "assignments": 0
+      },
+      "normalized": {
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+        "source_type": "IFC",
+        "source_location": "#1",
+        "evidence_level": "PARSED",
+        "object_id": "1",
+        "object_type": "IfcCableCarrierSegment",
+        "name": "TRAY_X600",
+        "guid": "0ud2j8XaT85uThpsZC_9gl",
+        "level": "",
+        "space": "",
+        "system": "",
+        "x": "",
+        "y": "",
+        "z": "",
+        "properties_json": "{\"ObjectType\": null, \"Tag\": \"\", \"property_sets\": {}, \"relationships\": [], \"coordinate_units\": \"IFC project units\"}",
+        "raw_name": "TRAY_X600",
+        "normalized_name": "TRAYX600"
+      }
+    },
+    {
+      "kind": "IFC",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+        "location": "#3",
+        "info": {
+          "id": 3,
+          "type": "IfcSpace",
+          "GlobalId": "3Pp8nyyP14o9zcp86iaTJj",
+          "OwnerHistory": null,
+          "Name": "Equipment Room",
+          "Description": null,
+          "ObjectType": null,
+          "ObjectPlacement": null,
+          "Representation": null,
+          "LongName": null,
+          "CompositionType": null,
+          "PredefinedType": null,
+          "ElevationWithFlooring": null
+        },
+        "assignments": 0
+      },
+      "normalized": {
+        "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+        "source_type": "IFC",
+        "source_location": "#3",
+        "evidence_level": "PARSED",
+        "object_id": "3",
+        "object_type": "IfcSpace",
+        "name": "Equipment Room",
+        "guid": "3Pp8nyyP14o9zcp86iaTJj",
+        "level": "",
+        "space": "",
+        "system": "",
+        "x": "",
+        "y": "",
+        "z": "",
+        "properties_json": "{\"ObjectType\": null, \"Tag\": \"\", \"property_sets\": {}, \"relationships\": [], \"coordinate_units\": \"IFC project units\"}",
+        "raw_name": "Equipment Room",
+        "normalized_name": "EQUIPMENTROOM"
+      }
+    },
+    {
+      "kind": "DOCX",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+        "paragraphs": [
+          "Scope",
+          "SCADA",
+          "RTU shall retain source evidence.",
+          "Cable Tray should be coordinated."
+        ],
+        "tables": [
+          [
+            [
+              "UPS",
+              "must be supplied"
+            ]
+          ]
+        ]
+      },
+      "parsed": [
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+          "source_type": "DOCX",
+          "source_location": "body:3",
+          "evidence_level": "PARSED",
+          "requirement_id": "body:3",
+          "section": "Scope / SCADA",
+          "requirement_text": "RTU shall retain source evidence.",
+          "original_text": "RTU shall retain source evidence.",
+          "keyword": "RTU",
+          "status": "CANDIDATE",
+          "requirement_confidence": "high"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+          "source_type": "DOCX",
+          "source_location": "body:4",
+          "evidence_level": "PARSED",
+          "requirement_id": "body:4",
+          "section": "Scope / SCADA",
+          "requirement_text": "Cable Tray should be coordinated.",
+          "original_text": "Cable Tray should be coordinated.",
+          "keyword": "CABLE TRAY|TRAY",
+          "status": "CANDIDATE",
+          "requirement_confidence": "normal"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+          "source_type": "DOCX",
+          "source_location": "body:5/row:1/cell:2",
+          "evidence_level": "PARSED",
+          "requirement_id": "body:5/row:1/cell:2",
+          "section": "Scope / SCADA",
+          "requirement_text": "must be supplied",
+          "original_text": "must be supplied",
+          "keyword": "",
+          "status": "CANDIDATE",
+          "requirement_confidence": "high"
+        }
+      ],
+      "normalized": [
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+          "source_type": "DOCX",
+          "source_location": "body:3",
+          "evidence_level": "PARSED",
+          "requirement_id": "body:3",
+          "section": "Scope / SCADA",
+          "requirement_text": "RTU shall retain source evidence.",
+          "original_text": "RTU shall retain source evidence.",
+          "keyword": "RTU",
+          "status": "CANDIDATE",
+          "requirement_confidence": "high"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+          "source_type": "DOCX",
+          "source_location": "body:4",
+          "evidence_level": "PARSED",
+          "requirement_id": "body:4",
+          "section": "Scope / SCADA",
+          "requirement_text": "Cable Tray should be coordinated.",
+          "original_text": "Cable Tray should be coordinated.",
+          "keyword": "CABLE TRAY|TRAY",
+          "status": "CANDIDATE",
+          "requirement_confidence": "normal"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+          "source_type": "DOCX",
+          "source_location": "body:5/row:1/cell:2",
+          "evidence_level": "PARSED",
+          "requirement_id": "body:5/row:1/cell:2",
+          "section": "Scope / SCADA",
+          "requirement_text": "must be supplied",
+          "original_text": "must be supplied",
+          "keyword": "",
+          "status": "CANDIDATE",
+          "requirement_confidence": "high"
+        }
+      ]
+    },
+    {
+      "kind": "PDF",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+        "page": 1,
+        "text": "1. SCADA requirements\nRTU shall connect to the UPS panel.\n"
+      },
+      "parsed": [
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": "1",
+          "section": "1. SCADA requirements",
+          "text_excerpt": "1. SCADA requirements",
+          "keyword": "SCADA"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": "1",
+          "section": "1. SCADA requirements",
+          "text_excerpt": "RTU shall connect to the UPS panel.",
+          "keyword": "RTU"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": "1",
+          "section": "1. SCADA requirements",
+          "text_excerpt": "RTU shall connect to the UPS panel.",
+          "keyword": "UPS"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": "1",
+          "section": "1. SCADA requirements",
+          "text_excerpt": "RTU shall connect to the UPS panel.",
+          "keyword": "UPS PANEL"
+        }
+      ],
+      "normalized": [
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": 1,
+          "text": "1. SCADA requirements\nRTU shall connect to the UPS panel.\n",
+          "heading_candidate": "1. SCADA requirements",
+          "section_candidate": "1. SCADA requirements",
+          "table_candidate": false,
+          "status": "OK"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": 1,
+          "section": "1. SCADA requirements",
+          "text_excerpt": "1. SCADA requirements",
+          "keyword": "SCADA"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": 1,
+          "section": "1. SCADA requirements",
+          "text_excerpt": "RTU shall connect to the UPS panel.",
+          "keyword": "RTU"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": 1,
+          "section": "1. SCADA requirements",
+          "text_excerpt": "RTU shall connect to the UPS panel.",
+          "keyword": "UPS"
+        },
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\appendix.pdf",
+          "source_type": "PDF",
+          "source_location": "page:1",
+          "evidence_level": "PARSED",
+          "page": 1,
+          "section": "1. SCADA requirements",
+          "text_excerpt": "RTU shall connect to the UPS panel.",
+          "keyword": "UPS PANEL"
+        }
+      ]
+    },
+    {
+      "kind": "Navisworks",
+      "source": {
+        "file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+        "text": "<exchange><batchtest><clashtests><clashtest><clashresults>\n    <clashresult name=\"Synthetic clash\" guid=\"c1\" status=\"new\" distance=\"-0.1\">\n    <clashpoint><pos3f x=\"1\" y=\"2\" z=\"3\" /></clashpoint><clashobjects>\n    <clashobject><objectattribute><name>GUID</name><value>0ud2j8XaT85uThpsZC_9gl</value></objectattribute></clashobject>\n    <clashobject><name>RTU-01</name></clashobject></clashobjects></clashresult>\n    </clashresults></clashtest></clashtests></batchtest></exchange>"
+      },
+      "parsed": [
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+          "source_type": "Navisworks",
+          "source_location": "clash:1",
+          "evidence_level": "PARSED",
+          "clash_id": "c1",
+          "clash_name": "Synthetic clash",
+          "status": "new",
+          "distance": "-0.1",
+          "object_a": "0ud2j8XaT85uThpsZC_9gl",
+          "object_b": "RTU-01",
+          "discipline_a": "",
+          "discipline_b": "",
+          "path_a": "",
+          "path_b": "",
+          "x": "1",
+          "y": "2",
+          "z": "3",
+          "properties_json": "[{\"GUID\": \"0ud2j8XaT85uThpsZC_9gl\"}, {}]",
+          "created_date": "",
+          "updated_date": ""
+        }
+      ],
+      "normalized": [
+        {
+          "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+          "source_type": "Navisworks",
+          "source_location": "clash:1",
+          "evidence_level": "PARSED",
+          "clash_id": "c1",
+          "clash_name": "Synthetic clash",
+          "status": "new",
+          "distance": "-0.1",
+          "object_a": "0ud2j8XaT85uThpsZC_9gl",
+          "object_b": "RTU-01",
+          "discipline_a": "",
+          "discipline_b": "",
+          "path_a": "",
+          "path_b": "",
+          "x": "1",
+          "y": "2",
+          "z": "3",
+          "properties_json": "[{\"GUID\": \"0ud2j8XaT85uThpsZC_9gl\"}, {}]",
+          "created_date": "",
+          "updated_date": ""
+        }
+      ]
+    }
+  ],
+  "actual_cross_reference": [
+    {
+      "check_type": "CAD_OBJECT_VS_BOQ",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\boq.xlsx",
+      "key": "RTU01",
+      "value_a": "RTU-01",
+      "value_b": "RTU01",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"source_type\": \"CAD\", \"source_location\": \"32\", \"evidence_level\": \"PARSED\", \"object_id\": \"7d92bd37c810:32\", \"object_type\": \"INSERT\", \"name\": \"RTU-01\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\drawing.dxf\\\", \\\"layer\\\": \\\"0\\\", \\\"block_name\\\": \\\"RTU-01\\\", \\\"x\\\": 1.0, \\\"y\\\": 2.0, \\\"z\\\": 3.0, \\\"rotation\\\": 0, \\\"xscale\\\": 1, \\\"yscale\\\": 1, \\\"zscale\\\": 1, \\\"handle\\\": \\\"32\\\", \\\"context\\\": \\\"\\\"}\", \"layer\": \"0\", \"handle\": \"32\", \"x\": 1.0, \"y\": 2.0, \"z\": 3.0, \"context\": \"\", \"raw_name\": \"RTU-01\", \"normalized_name\": \"RTU01\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\boq.xlsx\", \"source_type\": \"Excel\", \"source_location\": \"Equipment!row:3\", \"evidence_level\": \"PARSED\", \"sheet\": \"Equipment\", \"row_number\": 3, \"item_no\": \"001\", \"model\": \"RTU01\", \"description\": \"Remote Terminal Unit\", \"quantity\": 3.0, \"unit\": \"ea\", \"unit_price\": \"\", \"amount\": \"\", \"raw_name\": \"RTU01\", \"normalized_name\": \"RTU01\"}",
+      "note": "Name equivalence only; does not establish quantity or design compliance",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_type": "CrossReference",
+      "source_location": "CAD_OBJECT_VS_BOQ",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "IFC_OBJECT_VS_BOQ",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_b": "",
+      "key": "SCADA",
+      "value_a": "SCADA",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\model.ifc\", \"source_type\": \"IFC\", \"source_location\": \"#2\", \"evidence_level\": \"PARSED\", \"object_id\": \"2\", \"object_type\": \"IfcDistributionSystem\", \"name\": \"SCADA\", \"guid\": \"0o5iGJ8uj1HuutdlTYAjfk\", \"level\": \"\", \"space\": \"\", \"system\": \"\", \"x\": \"\", \"y\": \"\", \"z\": \"\", \"properties_json\": \"{\\\"ObjectType\\\": null, \\\"Tag\\\": \\\"\\\", \\\"property_sets\\\": {}, \\\"relationships\\\": [], \\\"coordinate_units\\\": \\\"IFC project units\\\"}\", \"raw_name\": \"SCADA\", \"normalized_name\": \"SCADA\"}",
+      "evidence_b": "{}",
+      "note": "No name evidence in supplied BOQ",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_type": "CrossReference",
+      "source_location": "IFC_OBJECT_VS_BOQ",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "IFC_OBJECT_VS_BOQ",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\boq.xlsx",
+      "key": "TRAYX600",
+      "value_a": "TRAY_X600",
+      "value_b": "TRAY-X600",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\model.ifc\", \"source_type\": \"IFC\", \"source_location\": \"#1\", \"evidence_level\": \"PARSED\", \"object_id\": \"1\", \"object_type\": \"IfcCableCarrierSegment\", \"name\": \"TRAY_X600\", \"guid\": \"0ud2j8XaT85uThpsZC_9gl\", \"level\": \"\", \"space\": \"\", \"system\": \"\", \"x\": \"\", \"y\": \"\", \"z\": \"\", \"properties_json\": \"{\\\"ObjectType\\\": null, \\\"Tag\\\": \\\"\\\", \\\"property_sets\\\": {}, \\\"relationships\\\": [], \\\"coordinate_units\\\": \\\"IFC project units\\\"}\", \"raw_name\": \"TRAY_X600\", \"normalized_name\": \"TRAYX600\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\boq.xlsx\", \"source_type\": \"Excel\", \"source_location\": \"Equipment!row:4\", \"evidence_level\": \"PARSED\", \"sheet\": \"Equipment\", \"row_number\": 4, \"item_no\": \"002\", \"model\": \"TRAY-X600\", \"description\": \"Cable Tray\", \"quantity\": 1.0, \"unit\": \"ea\", \"unit_price\": \"\", \"amount\": \"\", \"raw_name\": \"TRAY-X600\", \"normalized_name\": \"TRAYX600\"}",
+      "note": "Name equivalence only; does not establish quantity or design compliance",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_type": "CrossReference",
+      "source_location": "IFC_OBJECT_VS_BOQ",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "IFC_OBJECT_VS_BOQ",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_b": "",
+      "key": "EQUIPMENTROOM",
+      "value_a": "Equipment Room",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\model.ifc\", \"source_type\": \"IFC\", \"source_location\": \"#3\", \"evidence_level\": \"PARSED\", \"object_id\": \"3\", \"object_type\": \"IfcSpace\", \"name\": \"Equipment Room\", \"guid\": \"3Pp8nyyP14o9zcp86iaTJj\", \"level\": \"\", \"space\": \"\", \"system\": \"\", \"x\": \"\", \"y\": \"\", \"z\": \"\", \"properties_json\": \"{\\\"ObjectType\\\": null, \\\"Tag\\\": \\\"\\\", \\\"property_sets\\\": {}, \\\"relationships\\\": [], \\\"coordinate_units\\\": \\\"IFC project units\\\"}\", \"raw_name\": \"Equipment Room\", \"normalized_name\": \"EQUIPMENTROOM\"}",
+      "evidence_b": "{}",
+      "note": "No name evidence in supplied BOQ",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "source_type": "CrossReference",
+      "source_location": "IFC_OBJECT_VS_BOQ",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_OBJECT_VS_BOQ",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "BLKPLC",
+      "value_a": "BLK_PLC",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2E3\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2E3\", \"object_type\": \"INSERT\", \"name\": \"BLK_PLC\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"block_name\\\": \\\"BLK_PLC\\\", \\\"x\\\": 80.0, \\\"y\\\": 80.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"xscale\\\": 1, \\\"yscale\\\": 1, \\\"zscale\\\": 1, \\\"handle\\\": \\\"2E3\\\", \\\"context\\\": \\\"\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2E3\", \"x\": 80.0, \"y\": 80.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"BLK_PLC\", \"normalized_name\": \"BLKPLC\"}",
+      "evidence_b": "{}",
+      "note": "No name evidence in supplied BOQ",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_OBJECT_VS_BOQ",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_b": "",
+      "key": "SCADA",
+      "value_a": "SCADA RTU PANEL",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"source_type\": \"CAD\", \"source_location\": \"34\", \"evidence_level\": \"PARSED\", \"object_id\": \"7d92bd37c810:34\", \"object_type\": \"TEXT\", \"name\": \"SCADA RTU PANEL\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\drawing.dxf\\\", \\\"layer\\\": \\\"0\\\", \\\"entity_type\\\": \\\"TEXT\\\", \\\"text\\\": \\\"SCADA RTU PANEL\\\", \\\"x\\\": 0.0, \\\"y\\\": 0.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"34\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"0\", \"handle\": \"34\", \"x\": 0.0, \"y\": 0.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"SCADA RTU PANEL\", \"normalized_name\": \"SCADARTUPANEL\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+      "key": "RTU",
+      "value_a": "SCADA RTU PANEL",
+      "value_b": "RTU shall retain source evidence.",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"source_type\": \"CAD\", \"source_location\": \"34\", \"evidence_level\": \"PARSED\", \"object_id\": \"7d92bd37c810:34\", \"object_type\": \"TEXT\", \"name\": \"SCADA RTU PANEL\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\drawing.dxf\\\", \\\"layer\\\": \\\"0\\\", \\\"entity_type\\\": \\\"TEXT\\\", \\\"text\\\": \\\"SCADA RTU PANEL\\\", \\\"x\\\": 0.0, \\\"y\\\": 0.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"34\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"0\", \"handle\": \"34\", \"x\": 0.0, \"y\": 0.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"SCADA RTU PANEL\", \"normalized_name\": \"SCADARTUPANEL\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sow.docx\", \"source_type\": \"DOCX\", \"source_location\": \"body:3\", \"evidence_level\": \"PARSED\", \"requirement_id\": \"body:3\", \"section\": \"Scope / SCADA\", \"requirement_text\": \"RTU shall retain source evidence.\", \"original_text\": \"RTU shall retain source evidence.\", \"keyword\": \"RTU\", \"status\": \"CANDIDATE\", \"requirement_confidence\": \"high\"}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_b": "",
+      "key": "RTUPANEL",
+      "value_a": "SCADA RTU PANEL",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"source_type\": \"CAD\", \"source_location\": \"34\", \"evidence_level\": \"PARSED\", \"object_id\": \"7d92bd37c810:34\", \"object_type\": \"TEXT\", \"name\": \"SCADA RTU PANEL\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\drawing.dxf\\\", \\\"layer\\\": \\\"0\\\", \\\"entity_type\\\": \\\"TEXT\\\", \\\"text\\\": \\\"SCADA RTU PANEL\\\", \\\"x\\\": 0.0, \\\"y\\\": 0.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"34\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"0\", \"handle\": \"34\", \"x\": 0.0, \"y\": 0.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"SCADA RTU PANEL\", \"normalized_name\": \"SCADARTUPANEL\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+      "key": "RTU",
+      "value_a": "RTU-01",
+      "value_b": "RTU shall retain source evidence.",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"source_type\": \"CAD\", \"source_location\": \"32\", \"evidence_level\": \"PARSED\", \"object_id\": \"7d92bd37c810:32\", \"object_type\": \"INSERT\", \"name\": \"RTU-01\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\drawing.dxf\\\", \\\"layer\\\": \\\"0\\\", \\\"block_name\\\": \\\"RTU-01\\\", \\\"x\\\": 1.0, \\\"y\\\": 2.0, \\\"z\\\": 3.0, \\\"rotation\\\": 0, \\\"xscale\\\": 1, \\\"yscale\\\": 1, \\\"zscale\\\": 1, \\\"handle\\\": \\\"32\\\", \\\"context\\\": \\\"\\\"}\", \"layer\": \"0\", \"handle\": \"32\", \"x\": 1.0, \"y\": 2.0, \"z\": 3.0, \"context\": \"\", \"raw_name\": \"RTU-01\", \"normalized_name\": \"RTU01\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sow.docx\", \"source_type\": \"DOCX\", \"source_location\": \"body:3\", \"evidence_level\": \"PARSED\", \"requirement_id\": \"body:3\", \"section\": \"Scope / SCADA\", \"requirement_text\": \"RTU shall retain source evidence.\", \"original_text\": \"RTU shall retain source evidence.\", \"keyword\": \"RTU\", \"status\": \"CANDIDATE\", \"requirement_confidence\": \"high\"}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sow.docx",
+      "key": "RTU",
+      "value_a": "RTU-01 Panel",
+      "value_b": "RTU shall retain source evidence.",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2DA\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2DA\", \"object_type\": \"TEXT\", \"name\": \"RTU-01 Panel\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"entity_type\\\": \\\"TEXT\\\", \\\"text\\\": \\\"RTU-01 Panel\\\", \\\"x\\\": 10.0, \\\"y\\\": 10.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"2DA\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2DA\", \"x\": 10.0, \"y\": 10.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"RTU-01 Panel\", \"normalized_name\": \"RTU01PANEL\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sow.docx\", \"source_type\": \"DOCX\", \"source_location\": \"body:3\", \"evidence_level\": \"PARSED\", \"requirement_id\": \"body:3\", \"section\": \"Scope / SCADA\", \"requirement_text\": \"RTU shall retain source evidence.\", \"original_text\": \"RTU shall retain source evidence.\", \"keyword\": \"RTU\", \"status\": \"CANDIDATE\", \"requirement_confidence\": \"high\"}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "PANEL",
+      "value_a": "RTU-01 Panel",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2DA\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2DA\", \"object_type\": \"TEXT\", \"name\": \"RTU-01 Panel\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"entity_type\\\": \\\"TEXT\\\", \\\"text\\\": \\\"RTU-01 Panel\\\", \\\"x\\\": 10.0, \\\"y\\\": 10.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"2DA\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2DA\", \"x\": 10.0, \"y\": 10.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"RTU-01 Panel\", \"normalized_name\": \"RTU01PANEL\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "UPS",
+      "value_a": "UPS SB12 RACK\n中文測試",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2DB\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2DB\", \"object_type\": \"MTEXT\", \"name\": \"UPS SB12 RACK\\n中文測試\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"entity_type\\\": \\\"MTEXT\\\", \\\"text\\\": \\\"UPS SB12 RACK\\\\n中文測試\\\", \\\"x\\\": 20.0, \\\"y\\\": 30.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"2DB\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2DB\", \"x\": 20.0, \"y\": 30.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"UPS SB12 RACK\\n中文測試\", \"normalized_name\": \"UPSSB12RACK中文測試\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "SB12",
+      "value_a": "UPS SB12 RACK\n中文測試",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2DB\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2DB\", \"object_type\": \"MTEXT\", \"name\": \"UPS SB12 RACK\\n中文測試\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"entity_type\\\": \\\"MTEXT\\\", \\\"text\\\": \\\"UPS SB12 RACK\\\\n中文測試\\\", \\\"x\\\": 20.0, \\\"y\\\": 30.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"2DB\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2DB\", \"x\": 20.0, \"y\": 30.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"UPS SB12 RACK\\n中文測試\", \"normalized_name\": \"UPSSB12RACK中文測試\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "RACK",
+      "value_a": "UPS SB12 RACK\n中文測試",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2DB\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2DB\", \"object_type\": \"MTEXT\", \"name\": \"UPS SB12 RACK\\n中文測試\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"entity_type\\\": \\\"MTEXT\\\", \\\"text\\\": \\\"UPS SB12 RACK\\\\n中文測試\\\", \\\"x\\\": 20.0, \\\"y\\\": 30.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"2DB\\\", \\\"context\\\": \\\"\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2DB\", \"x\": 20.0, \"y\": 30.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"UPS SB12 RACK\\n中文測試\", \"normalized_name\": \"UPSSB12RACK中文測試\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "PLC",
+      "value_a": "PLC-A1",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2E5\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2E5\", \"object_type\": \"ATTRIB\", \"name\": \"PLC-A1\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"entity_type\\\": \\\"ATTRIB\\\", \\\"text\\\": \\\"PLC-A1\\\", \\\"x\\\": 80.0, \\\"y\\\": 80.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"handle\\\": \\\"2E5\\\", \\\"context\\\": \\\"tag=TAG1\\\", \\\"text_quality\\\": \\\"OK\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2E5\", \"x\": 80.0, \"y\": 80.0, \"z\": 0.0, \"context\": \"tag=TAG1\", \"raw_name\": \"PLC-A1\", \"normalized_name\": \"PLCA1\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CAD_KEYWORD_VS_REQUIREMENT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_b": "",
+      "key": "PLC",
+      "value_a": "BLK_PLC",
+      "value_b": "",
+      "result": "MISSING_B",
+      "confidence": 0,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\sample.dwg\", \"source_type\": \"CAD\", \"source_location\": \"2E3\", \"evidence_level\": \"PARSED\", \"object_id\": \"3b2cee54c20d:2E3\", \"object_type\": \"INSERT\", \"name\": \"BLK_PLC\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\sample.dwg\\\", \\\"layer\\\": \\\"SCADA_TEST\\\", \\\"block_name\\\": \\\"BLK_PLC\\\", \\\"x\\\": 80.0, \\\"y\\\": 80.0, \\\"z\\\": 0.0, \\\"rotation\\\": 0, \\\"xscale\\\": 1, \\\"yscale\\\": 1, \\\"zscale\\\": 1, \\\"handle\\\": \\\"2E3\\\", \\\"context\\\": \\\"\\\"}\", \"layer\": \"SCADA_TEST\", \"handle\": \"2E3\", \"x\": 80.0, \"y\": 80.0, \"z\": 0.0, \"context\": \"\", \"raw_name\": \"BLK_PLC\", \"normalized_name\": \"BLKPLC\"}",
+      "evidence_b": "{}",
+      "note": "Shared keyword evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\sample.dwg",
+      "source_type": "CrossReference",
+      "source_location": "CAD_KEYWORD_VS_REQUIREMENT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CLASH_VS_OBJECT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\model.ifc",
+      "key": "0UD2J8XAT85UTHPSZC9GL",
+      "value_a": "0UD2J8XAT85UTHPSZC9GL",
+      "value_b": "TRAY_X600",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\clashes.xml\", \"source_type\": \"Navisworks\", \"source_location\": \"clash:1\", \"evidence_level\": \"PARSED\", \"clash_id\": \"c1\", \"clash_name\": \"Synthetic clash\", \"status\": \"new\", \"distance\": \"-0.1\", \"object_a\": \"0ud2j8XaT85uThpsZC_9gl\", \"object_b\": \"RTU-01\", \"discipline_a\": \"\", \"discipline_b\": \"\", \"path_a\": \"\", \"path_b\": \"\", \"x\": \"1\", \"y\": \"2\", \"z\": \"3\", \"properties_json\": \"[{\\\"GUID\\\": \\\"0ud2j8XaT85uThpsZC_9gl\\\"}, {}]\", \"created_date\": \"\", \"updated_date\": \"\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\model.ifc\", \"source_type\": \"IFC\", \"source_location\": \"#1\", \"evidence_level\": \"PARSED\", \"object_id\": \"1\", \"object_type\": \"IfcCableCarrierSegment\", \"name\": \"TRAY_X600\", \"guid\": \"0ud2j8XaT85uThpsZC_9gl\", \"level\": \"\", \"space\": \"\", \"system\": \"\", \"x\": \"\", \"y\": \"\", \"z\": \"\", \"properties_json\": \"{\\\"ObjectType\\\": null, \\\"Tag\\\": \\\"\\\", \\\"property_sets\\\": {}, \\\"relationships\\\": [], \\\"coordinate_units\\\": \\\"IFC project units\\\"}\", \"raw_name\": \"TRAY_X600\", \"normalized_name\": \"TRAYX600\"}",
+      "note": "object_a: identifier/name evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+      "source_type": "CrossReference",
+      "source_location": "CLASH_VS_OBJECT",
+      "evidence_level": "DERIVED"
+    },
+    {
+      "check_type": "CLASH_VS_OBJECT",
+      "source_a": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+      "source_b": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\drawing.dxf",
+      "key": "RTU01",
+      "value_a": "RTU01",
+      "value_b": "RTU-01",
+      "result": "MATCH",
+      "confidence": 1,
+      "evidence_a": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\clashes.xml\", \"source_type\": \"Navisworks\", \"source_location\": \"clash:1\", \"evidence_level\": \"PARSED\", \"clash_id\": \"c1\", \"clash_name\": \"Synthetic clash\", \"status\": \"new\", \"distance\": \"-0.1\", \"object_a\": \"0ud2j8XaT85uThpsZC_9gl\", \"object_b\": \"RTU-01\", \"discipline_a\": \"\", \"discipline_b\": \"\", \"path_a\": \"\", \"path_b\": \"\", \"x\": \"1\", \"y\": \"2\", \"z\": \"3\", \"properties_json\": \"[{\\\"GUID\\\": \\\"0ud2j8XaT85uThpsZC_9gl\\\"}, {}]\", \"created_date\": \"\", \"updated_date\": \"\"}",
+      "evidence_b": "{\"source_file\": \"D:\\\\github\\\\ezdxf\\\\dwg_batch_tool\\\\demo_multiformat\\\\input\\\\drawing.dxf\", \"source_type\": \"CAD\", \"source_location\": \"32\", \"evidence_level\": \"PARSED\", \"object_id\": \"7d92bd37c810:32\", \"object_type\": \"INSERT\", \"name\": \"RTU-01\", \"properties_json\": \"{\\\"file\\\": \\\"D:\\\\\\\\github\\\\\\\\ezdxf\\\\\\\\dwg_batch_tool\\\\\\\\demo_multiformat\\\\\\\\input\\\\\\\\drawing.dxf\\\", \\\"layer\\\": \\\"0\\\", \\\"block_name\\\": \\\"RTU-01\\\", \\\"x\\\": 1.0, \\\"y\\\": 2.0, \\\"z\\\": 3.0, \\\"rotation\\\": 0, \\\"xscale\\\": 1, \\\"yscale\\\": 1, \\\"zscale\\\": 1, \\\"handle\\\": \\\"32\\\", \\\"context\\\": \\\"\\\"}\", \"layer\": \"0\", \"handle\": \"32\", \"x\": 1.0, \"y\": 2.0, \"z\": 3.0, \"context\": \"\", \"raw_name\": \"RTU-01\", \"normalized_name\": \"RTU01\"}",
+      "note": "object_b: identifier/name evidence only",
+      "source_file": "D:\\github\\ezdxf\\dwg_batch_tool\\demo_multiformat\\input\\clashes.xml",
+      "source_type": "CrossReference",
+      "source_location": "CLASH_VS_OBJECT",
+      "evidence_level": "DERIVED"
+    }
+  ],
+  "result_counts": {
+    "MATCH": 7,
+    "MISSING_B": 11
+  },
+  "ifc_missing_storage": [
+    {
+      "name": "SCADA",
+      "system_storage": "text",
+      "system_is_null": 0,
+      "system_literal": "''",
+      "space_literal": "''",
+      "level_literal": "''"
+    },
+    {
+      "name": "TRAY_X600",
+      "system_storage": "text",
+      "system_is_null": 0,
+      "system_literal": "''",
+      "space_literal": "''",
+      "level_literal": "''"
+    },
+    {
+      "name": "Equipment Room",
+      "system_storage": "text",
+      "system_is_null": 0,
+      "system_literal": "''",
+      "space_literal": "''",
+      "level_literal": "''"
+    }
+  ],
+  "counterexamples": [
+    {
+      "case": "RTU01 vs RTU-01",
+      "results": [
+        {
+          "check_type": "CAD_OBJECT_VS_BOQ",
+          "source_a": "synthetic_probe.dxf",
+          "source_b": "synthetic_probe.xlsx",
+          "key": "RTU01",
+          "value_a": "RTU01",
+          "value_b": "RTU-01",
+          "result": "MATCH",
+          "confidence": 1,
+          "evidence_a": "{\"name\": \"RTU01\", \"source_file\": \"synthetic_probe.dxf\", \"source_type\": \"CAD\", \"raw_name\": \"RTU01\", \"normalized_name\": \"RTU01\"}",
+          "evidence_b": "{\"model\": \"RTU-01\", \"source_file\": \"synthetic_probe.xlsx\", \"raw_name\": \"RTU-01\", \"normalized_name\": \"RTU01\"}",
+          "note": "Name equivalence only; does not establish quantity or design compliance",
+          "source_file": "synthetic_probe.dxf",
+          "source_type": "CrossReference",
+          "source_location": "CAD_OBJECT_VS_BOQ",
+          "evidence_level": "DERIVED"
+        }
+      ]
+    },
+    {
+      "case": "UPS-01 vs UPS PANEL",
+      "results": [
+        {
+          "check_type": "CAD_OBJECT_VS_BOQ",
+          "source_a": "synthetic_probe.dxf",
+          "source_b": "",
+          "key": "UPS01",
+          "value_a": "UPS-01",
+          "value_b": "",
+          "result": "MISSING_B",
+          "confidence": 0,
+          "evidence_a": "{\"name\": \"UPS-01\", \"source_file\": \"synthetic_probe.dxf\", \"source_type\": \"CAD\", \"raw_name\": \"UPS-01\", \"normalized_name\": \"UPS01\"}",
+          "evidence_b": "{}",
+          "note": "No name evidence in supplied BOQ",
+          "source_file": "synthetic_probe.dxf",
+          "source_type": "CrossReference",
+          "source_location": "CAD_OBJECT_VS_BOQ",
+          "evidence_level": "DERIVED"
+        },
+        {
+          "check_type": "OBJECT_VS_BOQ",
+          "source_a": "",
+          "source_b": "synthetic_probe.xlsx",
+          "key": "UPSPANEL",
+          "value_a": "UPSPANEL",
+          "value_b": "UPS PANEL",
+          "result": "MISSING_A",
+          "confidence": 0,
+          "evidence_a": "{}",
+          "evidence_b": "{\"model\": \"UPS PANEL\", \"source_file\": \"synthetic_probe.xlsx\", \"raw_name\": \"UPS PANEL\", \"normalized_name\": \"UPSPANEL\"}",
+          "note": "",
+          "source_file": "synthetic_probe.xlsx",
+          "source_type": "CrossReference",
+          "source_location": "OBJECT_VS_BOQ",
+          "evidence_level": "DERIVED"
+        }
+      ]
+    },
+    {
+      "case": "RACK02 vs RACK01",
+      "results": [
+        {
+          "check_type": "CAD_OBJECT_VS_BOQ",
+          "source_a": "synthetic_probe.dxf",
+          "source_b": "synthetic_probe.xlsx",
+          "key": "RACK02",
+          "value_a": "RACK02",
+          "value_b": "RACK01",
+          "result": "UNCERTAIN",
+          "confidence": 0.3,
+          "evidence_a": "{\"name\": \"RACK02\", \"source_file\": \"synthetic_probe.dxf\", \"source_type\": \"CAD\", \"raw_name\": \"RACK02\", \"normalized_name\": \"RACK02\"}",
+          "evidence_b": "{\"model\": \"RACK01\", \"source_file\": \"synthetic_probe.xlsx\", \"raw_name\": \"RACK01\", \"normalized_name\": \"RACK01\"}",
+          "note": "Prefix candidate requires manual review",
+          "source_file": "synthetic_probe.dxf",
+          "source_type": "CrossReference",
+          "source_location": "CAD_OBJECT_VS_BOQ",
+          "evidence_level": "DERIVED"
+        },
+        {
+          "check_type": "OBJECT_VS_BOQ",
+          "source_a": "",
+          "source_b": "synthetic_probe.xlsx",
+          "key": "RACK01",
+          "value_a": "RACK01",
+          "value_b": "RACK01",
+          "result": "MISSING_A",
+          "confidence": 0,
+          "evidence_a": "{}",
+          "evidence_b": "{\"model\": \"RACK01\", \"source_file\": \"synthetic_probe.xlsx\", \"raw_name\": \"RACK01\", \"normalized_name\": \"RACK01\"}",
+          "note": "",
+          "source_file": "synthetic_probe.xlsx",
+          "source_type": "CrossReference",
+          "source_location": "OBJECT_VS_BOQ",
+          "evidence_level": "DERIVED"
+        }
+      ]
+    },
+    {
+      "case": "Different case-sensitive IFC GUIDs",
+      "input_guid": "0AbCdEfGhIjKlMnOpQrStU",
+      "clash_guid": "0aBcDeFgHiJkLmNoPqRsTu",
+      "expanded_guids": [
+        "0a94c9cea50ad2b54bd6c58cdad5cdde",
+        "242e63683ea46c4ee5705f26746f6778"
+      ],
+      "results": [
+        {
+          "check_type": "CLASH_VS_OBJECT",
+          "source_a": "synthetic_probe.xml",
+          "source_b": "synthetic_probe.ifc",
+          "key": "0ABCDEFGHIJKLMNOPQRSTU",
+          "value_a": "0ABCDEFGHIJKLMNOPQRSTU",
+          "value_b": "Test",
+          "result": "MATCH",
+          "confidence": 1,
+          "evidence_a": "{\"object_a\": \"0aBcDeFgHiJkLmNoPqRsTu\", \"source_file\": \"synthetic_probe.xml\"}",
+          "evidence_b": "{\"name\": \"Test\", \"guid\": \"0AbCdEfGhIjKlMnOpQrStU\", \"source_type\": \"IFC\", \"source_file\": \"synthetic_probe.ifc\", \"object_type\": \"IfcCableCarrierSegment\", \"raw_name\": \"Test\", \"normalized_name\": \"TEST\"}",
+          "note": "object_a: identifier/name evidence only",
+          "source_file": "synthetic_probe.xml",
+          "source_type": "CrossReference",
+          "source_location": "CLASH_VS_OBJECT",
+          "evidence_level": "DERIVED"
+        },
+        {
+          "check_type": "CLASH_VS_OBJECT",
+          "source_a": "synthetic_probe.xml",
+          "source_b": "",
+          "key": "",
+          "value_a": "",
+          "value_b": "",
+          "result": "UNCERTAIN",
+          "confidence": 0,
+          "evidence_a": "{\"object_a\": \"0aBcDeFgHiJkLmNoPqRsTu\", \"source_file\": \"synthetic_probe.xml\"}",
+          "evidence_b": "{}",
+          "note": "object_b: identifier/name evidence only",
+          "source_file": "synthetic_probe.xml",
+          "source_type": "CrossReference",
+          "source_location": "CLASH_VS_OBJECT",
+          "evidence_level": "DERIVED"
+        }
+      ]
+    }
+  ],
+  "existing_summary": {
+    "total": 8,
+    "ok": 8,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 0,
+    "failed_files": [],
+    "stopped": false,
+    "fatal": "",
+    "dwg": 1,
+    "dxf": 1,
+    "keyword_hits": 0,
+    "unique_objects": 0,
+    "suspect_texts": 0,
+    "elapsed": 2.2407755851745605,
+    "exit_code": 0,
+    "source_hashes_unchanged": true
+  },
+  "actual_cad_keyword_hits": 12,
+  "actual_pdf_keyword_hits": 4,
+  "generated_source_tree_exists": false,
+  "audit_left_sources_and_outputs_unchanged": true
+}

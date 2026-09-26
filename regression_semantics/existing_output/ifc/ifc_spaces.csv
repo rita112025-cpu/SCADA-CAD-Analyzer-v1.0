@@ -1,0 +1,2 @@
+﻿source_file,source_type,source_location,evidence_level,object_id,object_type,name,tag,guid,level,space,system,x,y,z,width,height,length,boq_compare_eligible,comparison_role,specification,properties_json
+D:\github\ezdxf\dwg_batch_tool\demo_multiformat\input\model.ifc,IFC,#3,PARSED,3,IfcSpace,Equipment Room,,3Pp8nyyP14o9zcp86iaTJj,,,,,,,,,,False,REFERENCE_ONLY,,"{""ObjectType"": null, ""Tag"": null, ""property_sets"": {}, ""relationships"": [], ""coordinate_units"": ""IFC project units""}"

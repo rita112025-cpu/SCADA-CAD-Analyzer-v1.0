@@ -15,6 +15,154 @@ DEFAULT_OPTS = dict(recursive=True, convert=True, analyze=True, scada=True,
                     csv=True, json=True, overwrite=False)
 
 
+def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, compare=None):
+    """Independent mixed-format entrypoint; legacy CAD entrypoint remains compatible."""
+    import csv
+    import importlib
+    import json
+    import os
+    import tempfile
+    from engineering_data import Store, digest, evidence, UnsupportedFormat
+    import cross_reference
+    start = time.time()
+    out = resolve(cfg, 'output_dir').resolve()
+    sources = [Path(p).resolve() for p in (inputs or [resolve(cfg, 'input_dir')])]
+    if compare: sources.append(Path(compare).resolve())
+    if any(p == out or p.is_relative_to(out) for p in sources):
+        raise ValueError('Output must not contain the input folder or equal a selected input')
+    routes = {'.ifc': 'ifc', '.xlsx': 'excel', '.xlsm': 'excel', '.csv': 'excel', '.pdf': 'pdf', '.docx': 'docx', '.xml': 'navisworks', '.html': 'navisworks', '.htm': 'navisworks', '.dwg': 'cad', '.dxf': 'cad', '.nwd': 'unsupported'}
+    files = set()
+    for source in sources:
+        if not source.exists(): raise FileNotFoundError(source)
+        iterator = (source.rglob('*') if cfg.get('recursive', True) else source.glob('*')) if source.is_dir() else [source]
+        for p in iterator:
+            if p.is_file() and not p.is_relative_to(out) and (p.suffix.lower() in routes or not source.is_dir()): files.add(p)
+    if compare: files.add(Path(compare).resolve())
+    files = sorted(files)
+    out.mkdir(parents=True, exist_ok=True)
+    dbdir = out / 'database'
+    dbdir.mkdir(exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='project_', suffix='.db', dir=dbdir)
+    os.close(fd)
+    store = Store(temporary)
+    summary = dict(total=len(files), ok=0, failed=0, skipped=0, warnings=0, failed_files=[], stopped=False, fatal='', dwg=0, dxf=0, keyword_hits=0, unique_objects=0, suspect_texts=0)
+    log = log or (lambda level, msg: None)
+    try:
+        for i, path in enumerate(files, 1):
+            if stop_event is not None and stop_event.is_set():
+                summary['stopped'] = True
+                break
+            kind = routes.get(path.suffix.lower(), 'unsupported')
+            if progress: progress(kind.upper(), i, len(files), str(path))
+            status, error, hash_before = 'OK', '', ''
+            store.db.execute('SAVEPOINT file_parse')
+            try:
+                hash_before = digest(path)
+                if path.suffix.lower() == '.csv':
+                    with path.open(encoding='utf-8-sig', newline='') as f:
+                        header = next(csv.reader(f), [])
+                    if {'clash_id', 'clash_name', 'object_a', 'object_b', 'status'} <= set(header): kind = 'navisworks'
+                if kind == 'cad':
+                    status = _parse_cad(path, store, cfg, out, stop_event)
+                    summary[path.suffix.lower()[1:]] += 1
+                elif kind == 'unsupported':
+                    raise UnsupportedFormat(f'Unsupported format: {path.suffix}')
+                else:
+                    status = importlib.import_module('analyze_' + kind).parse(path, store, cfg)
+                if digest(path) != hash_before: raise RuntimeError('Source hash changed during analysis')
+                if status == 'OK': summary['ok'] += 1
+                else: summary['warnings'] += 1
+            except Exception as exc:
+                store.db.execute('ROLLBACK TO file_parse')
+                status = 'SKIPPED_DEPENDENCY' if isinstance(exc, ImportError) else ('UNSUPPORTED_FORMAT' if isinstance(exc, UnsupportedFormat) else 'FAILED')
+                error = f'{type(exc).__name__}: {exc}'
+                if isinstance(exc, ImportError): error += '; install the parser dependency listed in requirements.txt / requirements-ifc.txt'
+                summary['failed'] += 1
+                summary['skipped'] += status == 'SKIPPED_DEPENDENCY'
+                summary['failed_files'].append(f'{path}: {status}: {error}')
+                log_error(cfg, f'file={path} stage={kind} {error}')
+            finally:
+                store.db.execute('RELEASE file_parse')
+            store.add('project_files', evidence(path, path.suffix.lstrip('.').upper(), file_id=__import__('hashlib').sha256(str(path).encode()).hexdigest(), file_hash=hash_before, parsed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(), status=status, error=error))
+            store.db.commit()
+            log('OK' if status == 'OK' else 'WARN', f'{path.name}: {status} {error}')
+        summary['keyword_hits'] = store.db.execute("SELECT count(*) FROM exports WHERE report IN ('cad/scada_hits.csv', 'pdf/pdf_hits.csv')").fetchone()[0]
+        summary['unique_objects'] = store.db.execute("SELECT count(*) FROM exports WHERE report='cad/object_hits.csv'").fetchone()[0]
+        cross_reference.run(store, cfg, str(Path(compare).resolve()) if compare else None)
+        if compare:
+            from analyze_excel import compare as compare_boq
+            old_path = str(Path(compare).resolve())
+            old, new = [], []
+            for row in store.rows('boq_items'):
+                (old if row['source_file'] == old_path else new).append(row)
+            if len({r['source_file'] for r in new}) > 1:
+                raise ValueError('BOQ revision comparison requires exactly one new BOQ source; select that file explicitly')
+            for row in compare_boq(old, new): store.report('excel/boq_compare.csv', row)
+        store.db.commit()
+        store.export(out)
+        _empty_reports(out, store)
+        store.db.close()
+        os.replace(temporary, dbdir / 'project.db')
+    except BaseException:
+        store.db.close()
+        Path(temporary).unlink(missing_ok=True)
+        raise
+    summary.update(elapsed=time.time()-start, exit_code=int(bool(summary['failed'] or summary['warnings'] or summary['stopped'])))
+    log('WARN' if summary['exit_code'] else 'OK', 'Completed with warnings' if summary['exit_code'] else 'Completed')
+    return summary
+
+
+def _empty_reports(out, store):
+    from engineering_data import Store, COMMON
+    reports = {'cad': ['layers','texts','blocks','dimensions','attribs','file_index','scada_hits','scada_excluded','object_hits','block_summary'], 'ifc': ['ifc_objects','ifc_systems','ifc_spaces','ifc_summary'], 'excel': ['excel_sheets','excel_tables','boq_items','boq_summary','boq_compare'], 'pdf': ['pdf_pages','pdf_sections','pdf_hits','pdf_summary'], 'docx': ['docx_sections','docx_tables','requirements'], 'navisworks': ['navis_clashes','navis_summary'], 'cross_reference': ['cross_reference']}
+    for folder, names in reports.items():
+        for name in names:
+            path = out / folder / (name + '.csv')
+            if not store.db.execute('SELECT 1 FROM exports WHERE report=? LIMIT 1', (folder+'/'+name+'.csv',)).fetchone():
+                from engineering_data import SCHEMA
+                table = {'ifc_objects': 'engineering_objects', 'ifc_systems': 'engineering_objects', 'ifc_spaces': 'engineering_objects', 'boq_items': 'boq_items', 'requirements': 'requirements', 'navis_clashes': 'clashes', 'cross_reference': 'cross_reference_results', 'pdf_pages': 'documents', 'pdf_hits': 'documents', 'pdf_sections': 'document_sections', 'docx_sections': 'document_sections', 'docx_tables': 'document_sections', 'excel_tables': 'document_sections'}.get(name)
+                Store._csv(path, [], SCHEMA.get(table, COMMON))
+
+
+def _parse_cad(path, store, cfg, out, stop_event):
+    import json
+    from engineering_data import evidence, digest
+    from convert_single import convert
+    token = __import__('hashlib').sha256(str(path).encode()).hexdigest()[:12]
+    target = path
+    if path.suffix.lower() == '.dwg':
+        target = out / 'cad' / 'dxf' / (path.stem + '_' + token + '.dxf')
+        result = convert(path, target, cfg['accoreconsole'], cfg, overwrite=True, stop_event=stop_event)
+        if result['status'] != 'DXF_VALID': raise RuntimeError(str(result))
+    rows, info = analyze_dxf.analyze(target, str(path))
+    attributes = {}
+    for attr in rows['attribs']:
+        attributes.setdefault(attr.get('parent_handle'), []).append(attr)
+    spec_tags = {tag.upper() for tag in cfg.get('specification_attribute_tags', ['SPECIFICATION', 'SPEC'])}
+    for category, values in rows.items():
+        if category == 'entity_types': continue
+        for row in values:
+            store.report(f'cad/{category}.csv', dict(row, **evidence(path, 'CAD', row.get('handle', category))))
+            if category in ('blocks', 'texts'):
+                values = {k: row[k] for k in ('layer','handle','x','y','z','context') if k in row}
+                props = dict(row)
+                if category == 'blocks':
+                    props['attributes'] = attributes.get(row.get('handle'), [])
+                    specs = {a['text'] for a in props['attributes'] if a.get('tag','').upper() in spec_tags}
+                    values['specification'] = next(iter(specs)) if len(specs)==1 else None
+                store.add('engineering_objects', evidence(path, 'CAD', row.get('handle', ''), object_id=token+':'+row.get('handle', ''), object_type='INSERT' if category == 'blocks' else row['entity_type'], name=row.get('block_name', row.get('text', '')), properties_json=json.dumps(props, ensure_ascii=False), **values))
+    json_dir = out / 'cad' / 'json'
+    json_dir.mkdir(parents=True, exist_ok=True)
+    (json_dir / (path.stem + '_' + token + '.json')).write_text(json.dumps(dict(index=info, **rows), ensure_ascii=False), encoding='utf-8')
+    import ezdxf
+    import scada_rules
+    hits, excluded = find_scada.search_doc(ezdxf.readfile(target), str(path), scada_rules.build_rules(cfg))
+    for name, values in [('scada_hits', hits), ('scada_excluded', excluded), ('object_hits', scada_rules.build_object_hits(hits)), ('block_summary', scada_rules.build_block_summary(rows['blocks'], scada_rules.build_rules(cfg), rows['attribs']))]:
+        for row in values: store.report('cad/'+name+'.csv', dict(row, **evidence(path, 'CAD', row.get('handle', ''))))
+    store.report('cad/file_index.csv', evidence(path, 'CAD', **info, status='OK'))
+    return 'OK'
+
+
 def scan(input_dir, recursive=True):
     """Read-only scan. Never touches AutoCAD or modifies files."""
     root = Path(input_dir)
@@ -59,6 +207,8 @@ def fmt_duration(sec):
 def run_pipeline(cfg, opts, log=None, progress=None, stop_event=None):
     """Env check -> convert -> (validate inside convert) -> analyze -> scada -> summary.
     log(level, msg) ; progress(stage, i, n, current). Returns summary dict."""
+    if opts.get('multiformat'):
+        return run_multiformat(cfg, opts.get('inputs'), log, progress, stop_event, opts.get('compare'))
     opts = {**DEFAULT_OPTS, **opts}
     cfg = dict(cfg, recursive=opts["recursive"], overwrite=opts["overwrite"])
     out = resolve(cfg, "output_dir")
@@ -148,3 +298,8 @@ def run_pipeline(cfg, opts, log=None, progress=None, stop_event=None):
     else:
         _log("OK", "done")
     return finish()
+
+
+if __name__ == '__main__':
+    from engineering_data import parser_cli
+    sys.exit(parser_cli('mixed'))

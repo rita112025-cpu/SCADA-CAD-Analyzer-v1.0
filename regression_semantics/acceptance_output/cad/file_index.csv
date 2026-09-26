@@ -1,0 +1,2 @@
+﻿source_file,source_type,source_location,evidence_level,dxf_version,entity_count,layer_count,block_count,text_count,status
+D:\github\ezdxf\dwg_batch_tool\regression_semantics\acceptance_inputs\drawing.dxf,CAD,,PARSED,AC1027,3,2,3,1,OK
