@@ -30,7 +30,8 @@ def search_doc(doc, rel, rules):
         x, y, z = pt
         for m in scada_rules.find_matches(text, rules):
             row = dict(file=rel, keyword=m["keyword"], source_type=src, layer=layer, block=block,
-                       text=text, x=x, y=y, z=z, handle=handle, confidence=m["confidence"])
+                       text=text, x=x, y=y, z=z, handle=handle, confidence=m["confidence"],
+                       hit_source=src)
             (excluded if m["confidence"] == EXCLUDED else hits).append(row)
 
     for l in doc.layers:

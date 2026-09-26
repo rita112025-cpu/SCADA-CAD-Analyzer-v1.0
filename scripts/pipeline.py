@@ -39,6 +39,8 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
             if p.is_file() and not p.is_relative_to(out) and (p.suffix.lower() in routes or not source.is_dir()): files.add(p)
     if compare: files.add(Path(compare).resolve())
     files = sorted(files)
+    import revision_meta
+    revisions = revision_meta.infer(files)   # older/newer order only; formal `revision` stays NULL
     out.mkdir(parents=True, exist_ok=True)
     dbdir = out / 'database'
     dbdir.mkdir(exist_ok=True)
@@ -83,7 +85,7 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
                 log_error(cfg, f'file={path} stage={kind} {error}')
             finally:
                 store.db.execute('RELEASE file_parse')
-            store.add('project_files', evidence(path, path.suffix.lstrip('.').upper(), file_id=__import__('hashlib').sha256(str(path).encode()).hexdigest(), file_hash=hash_before, parsed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(), status=status, error=error))
+            store.add('project_files', evidence(path, path.suffix.lstrip('.').upper(), file_id=__import__('hashlib').sha256(str(path).encode()).hexdigest(), file_hash=hash_before, parsed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(), status=status, error=error, **revisions.get(path, {})))
             store.db.commit()
             log('OK' if status == 'OK' else 'WARN', f'{path.name}: {status} {error}')
         summary['keyword_hits'] = store.db.execute("SELECT count(*) FROM exports WHERE report IN ('cad/scada_hits.csv', 'pdf/pdf_hits.csv')").fetchone()[0]

@@ -19,6 +19,42 @@ L3 = re.compile(r"^(\d{1,2})\s*[.．、](?!\d)\s*(.*)$")
 ANNEX = re.compile(r"^(附件|附表)\s*([A-Z](?:-\d+)?|\d+(?:-\d+)?)(?![A-Za-z0-9])\s*(.*)$")
 
 
+# Printed page label read from the page itself (never computed from the physical page number):
+# footer/header band blocks such as "附錄C-9", "C-8", "- 3 -", "第 3 頁", "Page 3", "12".
+LABEL = re.compile(r"(?:第\s*\d{1,4}\s*頁|(?:page|p\.?)\s*\d{1,4}|[-–—]\s*\d{1,4}\s*[-–—]"
+                   r"|[^\W\d_]{1,8}\s*[-–]\s*\d{1,4}|[^\W\d_]{1,8}\s*\d{1,4}|\d{1,4}(?:\s*/\s*\d{1,4})?)", re.I)
+BAND = 0.12
+
+
+def printed_page_label(blocks, height):
+    """Printed page label of one page, or None. blocks: (x0, y0, x1, y1, text, ...) from PyMuPDF.
+    Footer is preferred; several different candidates in the same band mean ambiguity -> None."""
+    def candidates(pick):
+        found = []
+        for b in blocks:
+            text = re.sub(r"\s+", " ", b[4]).strip()
+            if text and len(text) <= 14 and pick(b) and LABEL.fullmatch(text) and text not in found:
+                found.append(text)
+        return found
+    for band in (lambda b: b[1] >= height * (1 - BAND), lambda b: b[3] <= height * BAND):
+        found = candidates(band)
+        if len(found) == 1:
+            return found[0]
+        if len(found) > 1:
+            return None
+    return None
+
+
+def citation(pdf_page, printed_page, section):
+    """e.g. 'PDF p.9 / Printed 附錄C-8 / § 四(十五)'; parts that are unknown are omitted."""
+    parts = [f"PDF p.{pdf_page}"]
+    if printed_page:
+        parts.append(f"Printed {printed_page}")
+    if section:
+        parts.append(f"§ {section}")
+    return " / ".join(parts)
+
+
 def furniture_lines(pages):
     """Stripped lines that appear on at least half of the pages (and on >= 3 pages)."""
     if len(pages) < 3:
@@ -94,6 +130,10 @@ def parse(path, store, cfg):
     rules = scada_rules.build_rules(dict(cfg, keywords=cfg.get('document_keywords', cfg.get('keywords', []))))
     with fitz.open(path) as doc:
         raw = [(page.get_text(), bool(page.get_images())) for page in doc]
+        labels = [printed_page_label(page.get_text('blocks'), page.rect.height) for page in doc]
+    # a "label" identical on many pages is a constant (year, code), not a page number
+    repeated = {v for v, n in Counter(l for l in labels if l).items() if n >= 3 and n * 2 >= len(labels)}
+    labels = [None if l in repeated else l for l in labels]
     page_lines = [text.splitlines() for text, _ in raw]
     furniture = furniture_lines(page_lines)
     tracker = ClauseTracker()
@@ -105,6 +145,7 @@ def parse(path, store, cfg):
         content = [l for l in lines if l.strip() and l.strip() not in furniture]
         heading = content[0].strip() if content else ''
         page_section = tracker.clause_id              # clause active where this page begins
+        printed = labels[pageno - 1]
         page_hits = []
         for line in lines:
             is_furniture = line.strip() in furniture
@@ -117,22 +158,30 @@ def parse(path, store, cfg):
             for m in scada_rules.find_matches(line, rules):
                 if m['confidence'] == scada_rules.EXCLUDED:
                     continue
-                page_hits.append(evidence(path, 'PDF', f'page:{pageno}', page=pageno,
-                                          section='' if is_furniture else tracker.clause_id,
+                sec = '' if is_furniture else tracker.clause_id
+                page_hits.append(evidence(path, 'PDF', f'page:{pageno}', page=pageno, pdf_page=pageno,
+                                          printed_page=printed, citation=citation(pageno, printed, sec),
+                                          section=sec,
                                           heading_candidate='(page header/footer)' if is_furniture else tracker.title_path,
                                           text_excerpt=line, keyword=m['keyword']))
-        row = evidence(path, 'PDF', f'page:{pageno}', page=pageno, text=text, heading_candidate=heading,
+        row = evidence(path, 'PDF', f'page:{pageno}', page=pageno, pdf_page=pageno, printed_page=printed,
+                       citation=citation(pageno, printed, page_section), text=text, heading_candidate=heading,
                        section_candidate=page_section, section=page_section,
                        table_candidate=any(len(s.split('  ')) > 2 for s in lines), status=status)
         store.add('documents', row, 'pdf/pdf_pages.csv')
-        store.add('document_sections', evidence(path, 'PDF', f'page:{pageno}', page=pageno, section=page_section,
-                                                heading=heading, text=text, kind='page'), 'pdf/pdf_sections.csv')
+        store.add('document_sections', evidence(path, 'PDF', f'page:{pageno}', page=pageno, pdf_page=pageno,
+                                                printed_page=printed, citation=citation(pageno, printed, page_section),
+                                                section=page_section, heading=heading, text=text, kind='page'),
+                  'pdf/pdf_sections.csv')
         for h in page_hits:
             store.add('documents', h, 'pdf/pdf_hits.csv')
         hits += len(page_hits)
     for order, (cid, level, parent, title, pageno, body) in enumerate(clauses, 1):
         body_text = '\n'.join(body)
-        store.add('document_sections', evidence(path, 'PDF', f'page:{pageno}/clause:{cid}', page=pageno, section=cid,
+        printed = labels[pageno - 1]
+        store.add('document_sections', evidence(path, 'PDF', f'page:{pageno}/clause:{cid}', page=pageno,
+                                                pdf_page=pageno, printed_page=printed,
+                                                citation=citation(pageno, printed, cid), section=cid,
                                                 section_id=cid, parent_section=parent, heading=title, level=level,
                                                 kind='clause', source_order=order, text=body_text,
                                                 original_text=body_text), 'pdf/pdf_sections.csv')

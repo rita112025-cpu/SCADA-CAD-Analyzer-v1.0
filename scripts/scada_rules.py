@@ -158,20 +158,25 @@ def is_scada_related(text_values, rules):
     return any(m["confidence"] != EXCLUDED for t in text_values for m in find_matches(t, rules))
 
 
+# hit_source = which kind of CAD element produced the hit (TEXT / MTEXT / ATTRIB / BLOCK_NAME / LAYER_NAME).
+# It is appended, never renamed: in the multi-format output source_type stays the source category ("CAD").
+HIT_SOURCES = ("TEXT", "MTEXT", "ATTRIB", "BLOCK_NAME", "LAYER_NAME")
 HIT_FIELDS = ["file", "keyword", "source_type", "layer", "block", "text", "x", "y", "z", "handle",
-              "confidence"]
+              "confidence", "hit_source"]
 OBJECT_FIELDS = ["file", "source_type", "handle", "layer", "block", "text", "x", "y", "z",
-                 "matched_keywords", "match_count", "confidence"]
+                 "matched_keywords", "match_count", "confidence", "hit_source"]
 BLOCK_SUMMARY_FIELDS = ["file", "block_name", "layer", "count", "first_x", "first_y", "first_z",
                         "scada_related", "scada_related_by"]
 
 
 def object_key(row):
-    """Stable identity of an entity: handle if present, otherwise a positional fallback."""
+    """Stable identity of an entity: handle if present, otherwise a positional fallback.
+    Uses hit_source (not source_type, which the multi-format writer overwrites with the category)."""
+    kind = row.get("hit_source") or row["source_type"]
     if row.get("handle"):
-        return (row["file"], row["source_type"], row["handle"])
-    return (row["file"], row["source_type"], row["layer"], row["x"], row["y"], row["z"],
-            row["text"] if row["source_type"] != "BLOCK_NAME" else row["block"])
+        return (row["file"], kind, row["handle"])
+    return (row["file"], kind, row["layer"], row["x"], row["y"], row["z"],
+            row["text"] if kind != "BLOCK_NAME" else row["block"])
 
 
 def build_object_hits(hit_rows):
@@ -183,7 +188,8 @@ def build_object_hits(hit_rows):
         if o is None:
             o = objs[k] = dict(file=r["file"], source_type=r["source_type"], handle=r["handle"],
                                layer=r["layer"], block=r["block"], text=r["text"], x=r["x"],
-                               y=r["y"], z=r["z"], kws=[], confidence=r["confidence"])
+                               y=r["y"], z=r["z"], kws=[], confidence=r["confidence"],
+                               hit_source=r.get("hit_source", r["source_type"]))
         if r["keyword"] not in o["kws"]:
             o["kws"].append(r["keyword"])
         if _RANK[r["confidence"]] > _RANK[o["confidence"]]:

@@ -8,12 +8,12 @@ from name_normalizer import normalize_name
 
 COMMON = 'source_file source_type source_location evidence_level'.split()
 SCHEMA = {
-    'project_files': 'file_id revision file_hash parsed_at status error',
+    'project_files': 'file_id revision revision_label revision_status revision_basis file_hash parsed_at status error',
     'engineering_objects': 'object_id object_type name raw_name normalized_name system layer level space guid handle x y z width height length properties_json specification boq_compare_eligible comparison_role tag',
     'requirements': 'requirement_id section page requirement_text original_text keyword category responsible_party status requirement_confidence subject table_index row_number column_headers_json row_context_json merged_cells_json requirement_fragments_json',
     'boq_items': 'sheet row_number item_no description model specification quantity unit unit_price amount revision remarks system location station floor raw_name normalized_name',
-    'documents': 'document_id page text heading_candidate section_candidate table_candidate status keyword text_excerpt section',
-    'document_sections': 'section_id section parent_section heading level kind source_order page text original_text cells_json',
+    'documents': 'document_id page text heading_candidate section_candidate table_candidate status keyword text_excerpt section pdf_page printed_page citation',
+    'document_sections': 'section_id section parent_section heading level kind source_order page text original_text cells_json pdf_page printed_page citation',
     'clashes': 'clash_id clash_name discipline_a discipline_b object_a object_b status distance x y z path_a path_b properties_json created_date updated_date object_a_type object_b_type object_a_source object_b_source',
     'cross_reference_results': 'check_type source_a source_b key value_a value_b result confidence evidence_a evidence_b note match_basis compliance_status specification_conflicts_json candidate_count',
 }

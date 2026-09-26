@@ -65,6 +65,9 @@ GUI log 寫入 `output\logs\gui.log`。掃描不會執行 AutoCAD、不修改任
 
 ## 輸出檔（csv）
 `file_index / layers / texts（新增 text_quality）/ blocks / block_summary / attribs / dimensions / scada_hits（新增 confidence）/ object_hits / scada_excluded`
+- `hit_source`（`scada_hits` / `object_hits`）：命中的 CAD 元素類型（TEXT / MTEXT / ATTRIB / BLOCK_NAME / LAYER_NAME），欄位附加在最後，原欄位不變。多格式輸出的 `source_type` 維持來源大類 `CAD`；單獨執行 `find_scada.py` 時 `source_type` 仍是舊值（TEXT / MTEXT …）。
+- PDF：`pdf_page`（實體頁碼）、`printed_page`（從頁面頁首／頁尾實際讀到的頁碼，讀不到為 NULL，不做推算）、`citation`（例：`PDF p.9 / Printed 附錄C-8 / § 四(十五)`）。
+- `project_files`：`revision`（正式版次，未知為 NULL）、`revision_label`（older / newer / order_i_of_n）、`revision_status`（inferred_order / conflicting_order / unknown）、`revision_basis`（filename、mtime、core_modified）。只推論新舊順序，不產生 RevA / RevB；依據互相矛盾時不給標籤。
 - `object_hits.csv`：每個 entity 一列，`matched_keywords` 以 `|` 合併（如 `SCADA|TRAY`）；無 handle 時以「檔案+類型+圖層+座標+文字」為 key。
 - `block_summary.csv`：依 file、count（大到小）、block_name 排序；`scada_related` 依 block 名稱或圖層名稱是否命中。`blocks.csv` 仍保留每個 instance。
 - `scada_excluded.csv`：被判為雜訊而未列入 `scada_hits.csv` 的命中，供人工抽查。
