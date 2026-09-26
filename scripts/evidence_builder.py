@@ -95,7 +95,7 @@ def build(db, project_id='default', include_derived=False):
                     text = content_for(table, row)
                     if not text or not text.strip(): continue
                     source_type = row.get('source_type', info['source_type'])
-                    location = {k: row[k] for k in ('source_location','handle','layer','x','y','z','guid','level','space','page','section','sheet','row_number','item_no','source_order','clash_id','object_a','object_b') if row.get(k) not in (None, '')}
+                    location = {k: row[k] for k in ('source_location','handle','layer','x','y','z','guid','level','space','page','section','sheet','row_number','item_no','source_order','clash_id','object_a','object_b','table_index','pdf_page','printed_page') if row.get(k) not in (None, '')}
                     location.update(file=source, record_table=table, record_id=record_id)
                     original_location = row.get('source_location', '')
                     if source_type == 'DOCX':

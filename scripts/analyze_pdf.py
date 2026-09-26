@@ -6,8 +6,12 @@ The numbering state carries across pages in reading order. Lines repeated on mos
 headers / footers) are page furniture: they never start a clause and are not used as a page heading."""
 import re
 from collections import Counter
+from pathlib import Path
+
+import json
 
 from engineering_data import evidence, parser_cli
+import pdf_boq
 import scada_rules
 
 CN = "一二三四五六七八九十百"
@@ -185,9 +189,47 @@ def parse(path, store, cfg):
                                                 section_id=cid, parent_section=parent, heading=title, level=level,
                                                 kind='clause', source_order=order, text=body_text,
                                                 original_text=body_text), 'pdf/pdf_sections.csv')
+    boq = store_boq_rows(path, store, cfg, labels)
     store.report('pdf/pdf_summary.csv', evidence(path, 'PDF', pages=len(raw), keyword_hits=hits, ocr_pages=scanned,
-                                                 clauses=len(clauses), furniture_lines=len(furniture)))
+                                                 clauses=len(clauses), furniture_lines=len(furniture),
+                                                 boq_status=boq['status'], boq_rows=boq['rows'],
+                                                 boq_skipped=boq['skipped']))
+    if boq['status'] == 'SKIPPED_DEPENDENCY' and cfg.get('pdf_boq_tables') == 'required':
+        return 'SKIPPED_DEPENDENCY'
     return 'OCR_REQUIRED' if scanned else 'OK'
+
+
+def store_boq_rows(path, store, cfg, labels):
+    """BOQ table rows -> the existing boq_items table (+ report csv). Rebuildable: earlier rows of the same
+    source are removed first, so a re-run never leaves stale or duplicate rows.
+    cfg["pdf_boq_tables"]: "auto" (default) | "required" | "off". Without pdfplumber: status SKIPPED_DEPENDENCY;
+    the PDF text evidence is still produced."""
+    mode = cfg.get('pdf_boq_tables', 'auto')
+    result = dict(status='OFF', rows=0, skipped=0)
+    if mode == 'off':
+        return result
+    try:
+        rows, skipped = pdf_boq.extract_boq_rows(path, cfg.get('pdf_boq_aliases'))
+    except ImportError:
+        return dict(status='SKIPPED_DEPENDENCY', rows=0, skipped=0)
+    store.clear_source(str(Path(path).resolve()), 'boq_items', ('pdf/boq_items.csv',))
+    store.clear_source(str(Path(path).resolve()), None, ('pdf/boq_skipped.csv',))
+    for r in rows:
+        printed = labels[r['page'] - 1] if r['page'] - 1 < len(labels) else None
+        loc = f"page:{r['page']}/table:{r['table']}/row:{r['row']}"
+        store.add('boq_items', evidence(
+            path, 'PDF', loc, page=r['page'], pdf_page=r['page'], printed_page=printed, table_index=r['table'],
+            row_number=r['row'], sheet=f"page {r['page']} table {r['table']}", item_no=r['item_no'],
+            description=r['description'], specification=r['spec'], unit=r['unit'],
+            quantity='' if r['qty'] is None else r['qty'], quantity_text=r['qty_text'], remarks=r['remarks'],
+            tags=' '.join(r['tags']), parse_warnings_json=json.dumps(r['parse_warnings'], ensure_ascii=False),
+            citation=citation(r['page'], printed, f"table {r['table']} row {r['row']}")), 'pdf/boq_items.csv')
+    for k in skipped:
+        loc = f"page:{k['page']}/table:{k['table']}" + (f"/row:{k['row']}" if k['row'] else '')
+        store.report('pdf/boq_skipped.csv', evidence(path, 'PDF', loc, page=k['page'], table_index=k['table'],
+                                                     row_number=k['row'] or '', reason=k['reason'],
+                                                     cells_json=json.dumps(k['cells'], ensure_ascii=False)))
+    return dict(status='OK' if rows else 'NO_BOQ_ROWS', rows=len(rows), skipped=len(skipped))
 
 
 if __name__ == '__main__':

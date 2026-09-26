@@ -10,7 +10,7 @@
 | Production Approval | NOT APPROVED |
 | 版本標籤 | `v1.5.2`（前版 `v1.5.1`、`v1.5-semantic-validation-candidate`） |
 
-功能擴充及 Retrieval／Ollama／Dify 整合維持暫停。正式狀態、真實資料驗收範圍與恢復條件見 [VERSION_STATUS.md](VERSION_STATUS.md)。
+功能凍結已「部分解除」（見 [VERSION_STATUS.md](VERSION_STATUS.md)）：允許受控的 BOQ 逐列解析、Designer 可行性測試與品質修正；Retrieval／RAG／Ollama／Dify／Open WebUI 仍凍結。正式狀態、真實資料驗收範圍與恢復條件見 [VERSION_STATUS.md](VERSION_STATUS.md)。
 
 ## 用途
 DWG 批次轉 DXF，再以 Python + ezdxf 解析圖層 / Block / Attribute / Text / MText / Dimension，輸出 CSV / JSON / log，並搜尋 SCADA 相關關鍵字。
@@ -65,6 +65,7 @@ GUI log 寫入 `output\logs\gui.log`。掃描不會執行 AutoCAD、不修改任
 
 ## 輸出檔（csv）
 `file_index / layers / texts（新增 text_quality）/ blocks / block_summary / attribs / dimensions / scada_hits（新增 confidence）/ object_hits / scada_excluded`
+- PDF 表格 BOQ 逐列解析（選用 `pdfplumber`，見 `requirements-pdf-tables.txt`）：每列寫入既有 `boq_items`（`pdf_page`、`table_index`、`row_number`、`quantity_text`、`parse_warnings_json`、`tags`、`citation`），位置為 `page:P/table:T/row:R`；表頭只在同一個表內有效，只有「下一頁的第一個表且欄數相同」才視為續表，欄數不同的列不套用而列入 `pdf/boq_skipped.csv`；數量無法解析時保留原文並記警告；重跑會重建該來源的列。設定 `pdf_boq_tables`：`auto`（預設，缺 pdfplumber 時略過並在 `pdf_summary` 記 `SKIPPED_DEPENDENCY`）、`required`（缺套件時檔案狀態為 `SKIPPED_DEPENDENCY`）、`off`。**僅完成合成資料驗證；真實 BOQ 驗證 NOT TESTED。**
 - `hit_source`（`scada_hits` / `object_hits`）：命中的 CAD 元素類型（TEXT / MTEXT / ATTRIB / BLOCK_NAME / LAYER_NAME），欄位附加在最後，原欄位不變。多格式輸出的 `source_type` 維持來源大類 `CAD`；單獨執行 `find_scada.py` 時 `source_type` 仍是舊值（TEXT / MTEXT …）。
 - PDF：`pdf_page`（實體頁碼）、`printed_page`（從頁面頁首／頁尾實際讀到的頁碼，讀不到為 NULL，不做推算）、`citation`（例：`PDF p.9 / Printed 附錄C-8 / § 四(十五)`）。
 - `project_files`：`revision`（正式版次，未知為 NULL）、`revision_label`（older / newer / order_i_of_n）、`revision_status`（inferred_order / conflicting_order / unknown）、`revision_basis`（filename、mtime、core_modified）。只推論新舊順序，不產生 RevA / RevB；依據互相矛盾時不給標籤。

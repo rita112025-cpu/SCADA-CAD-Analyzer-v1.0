@@ -116,13 +116,13 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
 
 def _empty_reports(out, store):
     from engineering_data import Store, COMMON
-    reports = {'cad': ['layers','texts','blocks','dimensions','attribs','file_index','scada_hits','scada_excluded','object_hits','block_summary'], 'ifc': ['ifc_objects','ifc_systems','ifc_spaces','ifc_summary'], 'excel': ['excel_sheets','excel_tables','boq_items','boq_summary','boq_compare'], 'pdf': ['pdf_pages','pdf_sections','pdf_hits','pdf_summary'], 'docx': ['docx_sections','docx_tables','requirements'], 'navisworks': ['navis_clashes','navis_summary'], 'cross_reference': ['cross_reference', 'coverage']}
+    reports = {'cad': ['layers','texts','blocks','dimensions','attribs','file_index','scada_hits','scada_excluded','object_hits','block_summary'], 'ifc': ['ifc_objects','ifc_systems','ifc_spaces','ifc_summary'], 'excel': ['excel_sheets','excel_tables','boq_items','boq_summary','boq_compare'], 'pdf': ['pdf_pages','pdf_sections','pdf_hits','pdf_summary','boq_items','boq_skipped'], 'docx': ['docx_sections','docx_tables','requirements'], 'navisworks': ['navis_clashes','navis_summary'], 'cross_reference': ['cross_reference', 'coverage']}
     for folder, names in reports.items():
         for name in names:
             path = out / folder / (name + '.csv')
             if not store.db.execute('SELECT 1 FROM exports WHERE report=? LIMIT 1', (folder+'/'+name+'.csv',)).fetchone():
                 from engineering_data import SCHEMA
-                table = {'ifc_objects': 'engineering_objects', 'ifc_systems': 'engineering_objects', 'ifc_spaces': 'engineering_objects', 'boq_items': 'boq_items', 'requirements': 'requirements', 'navis_clashes': 'clashes', 'cross_reference': 'cross_reference_results', 'pdf_pages': 'documents', 'pdf_hits': 'documents', 'pdf_sections': 'document_sections', 'docx_sections': 'document_sections', 'docx_tables': 'document_sections', 'excel_tables': 'document_sections'}.get(name)
+                table = {'ifc_objects': 'engineering_objects', 'ifc_systems': 'engineering_objects', 'ifc_spaces': 'engineering_objects', 'boq_items': 'boq_items', 'requirements': 'requirements', 'navis_clashes': 'clashes', 'cross_reference': 'cross_reference_results', 'pdf_pages': 'documents', 'boq_skipped': 'document_sections', 'pdf_hits': 'documents', 'pdf_sections': 'document_sections', 'docx_sections': 'document_sections', 'docx_tables': 'document_sections', 'excel_tables': 'document_sections'}.get(name)
                 Store._csv(path, [], SCHEMA.get(table, COMMON))
 
 

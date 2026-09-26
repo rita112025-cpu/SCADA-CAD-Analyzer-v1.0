@@ -26,9 +26,36 @@ This version is not Production and is not an AI Assistant.
 
 Evidence: [semantic validation report](SEMANTICS_REPORT.md), [test results](semantics_regression_results.txt), [acceptance evidence](regression_semantics/evidence.json), [HTML review](regression_semantics/index.html).
 
-## Development hold
+## Feature freeze status: PARTIALLY LIFTED
 
-Feature expansion is paused. Do not add parsers, GUI features, embedding, Ollama or Dify integration. Previously developed retrieval modules remain unintegrated. Test success does not authorize resuming those integrations or changing approval status.
+Allowed (controlled, bounded, reversible):
+
+- Evidence-first BOQ row parser integration (PDF tables -> existing `boq_items` / evidence chunks)
+- Cable Tray Designer bridge feasibility testing (no formal integration)
+- Regression tests / validation tooling
+- Bug fixes and evidence-quality improvements
+
+Still frozen:
+
+- Retrieval / RAG
+- Ollama
+- Dify
+- Open WebUI integration
+- New unrelated parsers
+- Production automation
+
+Previously developed retrieval modules remain unintegrated. Test success does not authorize lifting the remaining freeze or changing approval status.
+
+## BOQ PDF row parser (v1.6.0 candidate)
+
+| Item | Status |
+| --- | --- |
+| Implementation | PASS |
+| Synthetic regression | PASS (gates B1–B10, `tests/test_pdf_boq.py`) |
+| Real BOQ validation | NOT TESTED — no real project BOQ available |
+| Production Approval for BOQ parser | NOT APPROVED |
+
+Only the row-parsing logic was ported (page + table + row location, table-scoped headers, continued-table rule, raw quantity text kept with a warning). No second schema: rows go to `boq_items`; evidence chunks are built by the existing evidence builder. Optional dependency: `pdfplumber` (`requirements-pdf-tables.txt`); without it the PDF text evidence is still produced and the BOQ step is recorded as `SKIPPED_DEPENDENCY`. The one real PDF available (a requirements appendix, not a BOQ) produced 0 BOQ rows, as expected.
 
 ## Next gate: real project validation
 

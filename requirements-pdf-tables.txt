@@ -1,0 +1,2 @@
+# Optional: PDF table (BOQ row) extraction
+pdfplumber>=0.11

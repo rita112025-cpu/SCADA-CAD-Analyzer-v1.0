@@ -10,7 +10,7 @@ Detailed evidence (source copies, analyzer output, review worksheets) is retaine
 
 Review: Technical SELF-REVIEWED · Engineering semantic SELF-REVIEWED · Independent engineering approval NOT PERFORMED · Production Approval NOT APPROVED.
 
-Not tested (source unavailable): IFC, BOQ, Clash.
+Not tested (source unavailable): IFC, BOQ, Clash. The PDF BOQ row parser (v1.6.0 candidate) is validated on synthetic data only; Real BOQ validation NOT TESTED.
 
 ## Round 1 gate
 
