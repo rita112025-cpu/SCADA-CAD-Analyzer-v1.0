@@ -25,7 +25,7 @@ class App:
     def __init__(self, root):
         self.root = root
         root.title("SCADA DWG Analyzer")
-        root.geometry("900x860")
+        root.geometry("900x740")
         root.minsize(760, 620)
         self.cfg = common.load_config()
         self.q = queue.Queue()
@@ -51,9 +51,10 @@ class App:
         self._check_env()
 
     # ---------- layout ----------
+    # Four numbered sections in one scrollable column:  1 source | 2 what to run (A: DWG->DXF, B: analysis)
+    # | 3 progress + log | 4 results.  Every control lives inside the scroll area, so nothing is unreachable.
     def _build(self):
-        pad = dict(padx=8, pady=3)
-        # Keep the existing form accessible on small screens/high-DPI displays.
+        pad = dict(padx=8, pady=4)
         shell = ttk.Frame(self.root)
         shell.pack(fill="both", expand=True)
         self.form_canvas = tk.Canvas(shell, highlightthickness=0)
@@ -62,101 +63,189 @@ class App:
         self.form_canvas.pack(side='left', fill='both', expand=True)
         self.form_canvas.configure(yscrollcommand=scrollbar.set)
         main = ttk.Frame(self.form_canvas, padding=8)
+        self.form_body = main
         window = self.form_canvas.create_window((0, 0), window=main, anchor='nw')
         main.bind('<Configure>', lambda event: self.form_canvas.configure(scrollregion=self.form_canvas.bbox('all')))
         self.form_canvas.bind('<Configure>', lambda event: self.form_canvas.itemconfigure(window, width=event.width))
+
         def scroll(event):
             if not isinstance(event.widget, (tk.Text, tk.Listbox)):
                 self.form_canvas.yview_scroll(-int(event.delta / 120), 'units')
         self.root.bind('<MouseWheel>', scroll)
+        self.root.bind_all('<FocusIn>', self._on_focus_in, add='+')   # Tab to an off-screen control scrolls to it
 
-        env = ttk.LabelFrame(main, text="環境 Environment")
-        env.pack(fill="x", **pad)
+        # ---- 1 來源 ----
+        src = ttk.LabelFrame(main, text="① 來源　Source")
+        src.pack(fill="x", **pad)
+        env = ttk.Frame(src)
+        env.pack(fill="x", padx=6, pady=(4, 0))
         self.env_labels = {}
         for i, k in enumerate(self.v_env):
-            lb = ttk.Label(env, textvariable=self.v_env[k], width=32)
-            lb.grid(row=0, column=i, sticky="w", padx=6, pady=2)
+            lb = ttk.Label(env, textvariable=self.v_env[k], wraplength=380, justify="left")
+            lb.grid(row=i // 2, column=i % 2, sticky="w", padx=(0, 16), pady=1)
             self.env_labels[k] = lb
-        ttk.Button(env, text="重新檢查", command=self._check_env).grid(row=0, column=4, padx=6)
+        env.columnconfigure(0, weight=1)
+        env.columnconfigure(1, weight=1)
+        ttk.Button(env, text="重新檢查", command=self._check_env).grid(row=0, column=2, rowspan=2, padx=4)
+        self.v_accore = tk.StringVar(value="")
+        self.lbl_accore = ttk.Label(src, textvariable=self.v_accore, wraplength=700, justify="left")
+        self.lbl_accore.pack(fill="x", padx=6, pady=(2, 0))
+        self._wrap_to_width(self.lbl_accore, src)
+        note = ttk.Label(src, text="AutoCAD／accoreconsole 只在處理 DWG（流程 A）時需要；DXF、IFC、Excel、PDF、DOCX、"
+                                   "Navisworks 的分析（流程 B）不依賴 AutoCAD。", wraplength=700, justify="left")
+        note.pack(fill="x", padx=6, pady=(2, 4))
+        self._wrap_to_width(note, src)
 
-        paths = ttk.LabelFrame(main, text="路徑 Paths")
-        paths.pack(fill="x", **pad)
-        for r, (label, var) in enumerate((("輸入資料夾 Input", self.v_in),
-                                          ("輸出資料夾 Output", self.v_out))):
-            ttk.Label(paths, text=label, width=18).grid(row=r, column=0, sticky="w", padx=6, pady=3)
-            ttk.Entry(paths, textvariable=var).grid(row=r, column=1, sticky="ew", pady=3)
-            ttk.Button(paths, text="Browse", command=lambda v=var: self._browse(v)).grid(
-                row=r, column=2, padx=6)
+        paths = ttk.Frame(src)
+        paths.pack(fill="x", padx=6, pady=2)
+        for r, (label, var) in enumerate((("輸入資料夾 Input", self.v_in), ("輸出資料夾 Output", self.v_out))):
+            ttk.Label(paths, text=label, width=16).grid(row=r, column=0, sticky="w", pady=3)
+            ttk.Entry(paths, textvariable=var).grid(row=r, column=1, sticky="ew", pady=3, padx=4)
+            ttk.Button(paths, text="Browse", command=lambda v=var: self._browse(v)).grid(row=r, column=2, padx=4)
         paths.columnconfigure(1, weight=1)
+        scanrow = ttk.Frame(src)
+        scanrow.pack(fill="x", padx=6, pady=(2, 6))
+        self.btn_scan = ttk.Button(scanrow, text="掃描輸入資料夾 Scan", command=self._scan)
+        self.btn_scan.pack(side="left")
+        lbl_scan = ttk.Label(scanrow, textvariable=self.v_scan, wraplength=520, justify="left")
+        lbl_scan.pack(side="left", padx=10, fill="x", expand=True)
+        self._wrap_to_width(lbl_scan, scanrow, margin=170)
 
-        data = ttk.LabelFrame(main, text="資料分析 · CAD / IFC / Excel / PDF / DOCX / Navisworks")
-        data.pack(fill="x", **pad)
-        self.v_analysis = tk.StringVar(value="使用上方輸入資料夾，或選擇多個檔案")
-        ttk.Label(data, textvariable=self.v_analysis, wraplength=700).grid(row=0, column=0, columnspan=3, sticky="w", padx=8, pady=4)
-        self.btn_files = ttk.Button(data, text="選擇檔案", command=self._select_analysis_files)
-        self.btn_files.grid(row=1, column=0, padx=8, pady=4, sticky="w")
-        self.btn_folder = ttk.Button(data, text="使用輸入資料夾", command=self._analysis_folder)
-        self.btn_folder.grid(row=1, column=1, padx=8, pady=4, sticky="w")
-        self.btn_analysis = ttk.Button(data, text="分析工程資料", command=self._start_analysis)
-        self.btn_analysis.grid(row=1, column=2, padx=8, pady=4, sticky="w")
-        self.analysis_outputs = {}
-        for i, rel in enumerate(('database/project.db', 'cross_reference/cross_reference.csv', 'docx/requirements.csv', 'excel/boq_items.csv', 'ifc/ifc_objects.csv', 'navisworks/navis_clashes.csv')):
-            button = ttk.Button(data, text="開啟 " + Path(rel).name, command=lambda r=rel: self._open(r), state="disabled")
-            button.grid(row=2+i//3, column=i%3, sticky="ew", padx=8, pady=3)
-            self.analysis_outputs[rel] = button
-        for col in range(3): data.columnconfigure(col, weight=1)
-        self.v_out.trace_add('write', lambda *args: self._refresh_analysis_outputs())
-        self._refresh_analysis_outputs()
+        # ---- 2 執行內容 ----
+        run = ttk.LabelFrame(main, text="② 執行內容　What to run（兩條流程各自獨立）")
+        run.pack(fill="x", **pad)
+        cols = ttk.Frame(run)
+        cols.pack(fill="x", padx=6, pady=4)
+        cols.columnconfigure(0, weight=1, uniform="flow")
+        cols.columnconfigure(1, weight=1, uniform="flow")
 
-        op = ttk.LabelFrame(main, text="處理選項 Processing")
-        op.pack(fill="x", **pad)
+        fa = ttk.LabelFrame(cols, text="A．DWG 批次轉 DXF（需要 AutoCAD）")
+        fa.grid(row=0, column=0, sticky="nsew", padx=(0, 4))
+        na = ttk.Label(fa, text="讀取輸入資料夾內的 .dwg，用 accoreconsole 轉成 DXF，再解析並搜尋 SCADA 關鍵字。",
+                       wraplength=340, justify="left")
+        na.pack(fill="x", padx=6, pady=(4, 2))
+        self._wrap_to_width(na, fa)
+        grid = ttk.Frame(fa)
+        grid.pack(fill="x", padx=6)
         items = [("recursive", "遞迴搜尋子資料夾"), ("convert", "DWG → DXF"),
                  ("analyze", "DXF 內容解析"), ("scada", "SCADA 關鍵字搜尋"),
                  ("csv", "產生 CSV"), ("json", "產生 JSON"), ("overwrite", "覆寫既有 DXF")]
         for i, (k, t) in enumerate(items):
-            ttk.Checkbutton(op, text=t, variable=self.opts[k]).grid(
-                row=i // 4, column=i % 4, sticky="w", padx=8, pady=2)
+            ttk.Checkbutton(grid, text=t, variable=self.opts[k]).grid(row=i // 2, column=i % 2, sticky="w", padx=4, pady=1)
+        self.btn_start = ttk.Button(fa, text="開始 DWG 轉 DXF＋解析", command=self._start)
+        self.btn_start.pack(anchor="w", padx=6, pady=6)
 
-        kw = ttk.LabelFrame(main, text="關鍵字 Keywords（一行一個）")
-        kw.pack(fill="x", **pad)
-        self.kw_text = tk.Text(kw, height=5, width=30, font=("Consolas", 10))
+        fb = ttk.LabelFrame(cols, text="B．工程資料分析（不需要 AutoCAD）")
+        fb.grid(row=0, column=1, sticky="nsew", padx=(4, 0))
+        nb = ttk.Label(fb, text="直接解析 DXF、IFC、Excel/CSV、PDF、DOCX、Navisworks；選到 .dwg 時才會用到 AutoCAD。"
+                                "「遞迴搜尋」沿用左側設定。", wraplength=340, justify="left")
+        nb.pack(fill="x", padx=6, pady=(4, 2))
+        self._wrap_to_width(nb, fb)
+        self.v_analysis = tk.StringVar(value="使用上方輸入資料夾，或選擇多個檔案")
+        la = ttk.Label(fb, textvariable=self.v_analysis, wraplength=340, justify="left")
+        la.pack(fill="x", padx=6, pady=2)
+        self._wrap_to_width(la, fb)
+        brow = ttk.Frame(fb)
+        brow.pack(fill="x", padx=6, pady=2)
+        self.btn_files = ttk.Button(brow, text="選擇檔案", command=self._select_analysis_files)
+        self.btn_files.pack(side="left")
+        self.btn_folder = ttk.Button(brow, text="使用輸入資料夾", command=self._analysis_folder)
+        self.btn_folder.pack(side="left", padx=6)
+        self.btn_analysis = ttk.Button(fb, text="開始分析工程資料", command=self._start_analysis)
+        self.btn_analysis.pack(anchor="w", padx=6, pady=6)
+
+        kw = ttk.LabelFrame(run, text="SCADA 關鍵字 Keywords（兩條流程共用，一行一個）")
+        kw.pack(fill="x", padx=6, pady=(2, 6))
+        self.kw_text = tk.Text(kw, height=3, width=30, font=("Consolas", 10))
         self.kw_text.pack(side="left", fill="both", expand=True, padx=6, pady=4)
         self.kw_text.insert("1.0", "\n".join(self.cfg.get("keywords", [])))
+        self.kw_text.bind("<Tab>", lambda e: (e.widget.tk_focusNext().focus_set(), "break")[1])
+        self.kw_text.bind("<Shift-Tab>", lambda e: (e.widget.tk_focusPrev().focus_set(), "break")[1])
         ttk.Button(kw, text="儲存設定", command=self._save_config).pack(side="right", padx=8)
 
-        ctl = ttk.Frame(main)
-        ctl.pack(fill="x", **pad)
-        self.btn_scan = ttk.Button(ctl, text="掃描檔案 Scan", command=self._scan)
-        self.btn_start = ttk.Button(ctl, text="開始處理 Start", command=self._start)
-        self.btn_stop = ttk.Button(ctl, text="停止 Stop", command=self._stop, state="disabled")
-        for b in (self.btn_scan, self.btn_start, self.btn_stop):
-            b.pack(side="left", padx=4)
-        ttk.Label(ctl, textvariable=self.v_scan).pack(side="left", padx=12)
+        # ---- 3 執行狀態 ----
+        st = ttk.LabelFrame(main, text="③ 執行狀態　Progress")
+        st.pack(fill="both", expand=True, **pad)
+        pf = ttk.Frame(st)
+        pf.pack(fill="x", padx=6, pady=(4, 0))
+        self.btn_stop = ttk.Button(pf, text="停止 Stop", command=self._stop, state="disabled")
+        self.btn_stop.pack(side="left")
+        ttk.Progressbar(pf, variable=self.v_progress, maximum=100).pack(side="left", fill="x", expand=True, padx=8)
+        ttk.Label(pf, textvariable=self.v_ptext, width=34).pack(side="left")
+        cur = ttk.Label(st, textvariable=self.v_current, anchor="w", wraplength=760, justify="left")
+        cur.pack(fill="x", padx=8)
+        self._wrap_to_width(cur, st)
+        self.log_box = scrolledtext.ScrolledText(st, height=6, state="disabled", font=("Consolas", 9))
+        self.log_box.pack(fill="both", expand=True, padx=6, pady=6)
 
-        pf = ttk.Frame(main)
-        pf.pack(fill="x", **pad)
-        ttk.Progressbar(pf, variable=self.v_progress, maximum=100).pack(side="left", fill="x",
-                                                                       expand=True)
-        ttk.Label(pf, textvariable=self.v_ptext, width=34).pack(side="left", padx=8)
-        ttk.Label(main, textvariable=self.v_current, anchor="w").pack(fill="x", padx=10)
-
-        lf = ttk.LabelFrame(main, text="Log")
-        lf.pack(fill="both", expand=True, **pad)
-        self.log_box = scrolledtext.ScrolledText(lf, height=10, state="disabled",
-                                                 font=("Consolas", 9))
-        self.log_box.pack(fill="both", expand=True, padx=4, pady=4)
-
-        rf = ttk.LabelFrame(main, text="結果 Result")
+        # ---- 4 結果 ----
+        rf = ttk.LabelFrame(main, text="④ 結果　Results")
         rf.pack(fill="x", **pad)
+        self.result_frame = rf
         self.v_result = tk.StringVar(value="尚未執行")
-        ttk.Label(rf, textvariable=self.v_result, justify="left").pack(anchor="w", padx=8, pady=2)
-        bf = ttk.Frame(rf)
-        bf.pack(fill="x", pady=4)
-        for text, rel in (("開啟輸出資料夾", ""), ("開啟 scada_hits.csv", "csv/scada_hits.csv"),
-                          ("開啟 object_hits.csv", "csv/object_hits.csv"),
-                          ("開啟 file_index.csv", "csv/file_index.csv"),
-                          ("開啟 errors.log", "logs/errors.log")):
-            ttk.Button(bf, text=text, command=lambda r=rel: self._open(r)).pack(side="left", padx=4)
+        lr = ttk.Label(rf, textvariable=self.v_result, justify="left", wraplength=760)
+        lr.pack(fill="x", padx=8, pady=2)
+        self._wrap_to_width(lr, rf)
+        # one entry per output file; enabled only once the file exists
+        groups = (
+            ("共用", (("開啟輸出資料夾", ""), ("開啟 errors.log", "logs/errors.log"))),
+            ("流程 A 結果", (("開啟 scada_hits.csv", "csv/scada_hits.csv"), ("開啟 object_hits.csv", "csv/object_hits.csv"),
+                         ("開啟 file_index.csv", "csv/file_index.csv"))),
+            ("流程 B 結果", (("開啟 project.db", "database/project.db"),
+                         ("開啟 cross_reference.csv", "cross_reference/cross_reference.csv"),
+                         ("開啟 requirements.csv", "docx/requirements.csv"), ("開啟 boq_items.csv", "excel/boq_items.csv"),
+                         ("開啟 ifc_objects.csv", "ifc/ifc_objects.csv"),
+                         ("開啟 navis_clashes.csv", "navisworks/navis_clashes.csv"))),
+        )
+        self.output_buttons = {}
+        self.analysis_outputs = {}
+        for title, files in groups:
+            box = ttk.Frame(rf)
+            box.pack(fill="x", padx=8, pady=(2, 4))
+            ttk.Label(box, text=title).grid(row=0, column=0, columnspan=3, sticky="w")
+            for i, (text, rel) in enumerate(files):
+                b = ttk.Button(box, text=text, command=lambda r=rel: self._open(r), state="disabled")
+                b.grid(row=1 + i // 3, column=i % 3, sticky="ew", padx=(0, 6), pady=2)
+                self.output_buttons[rel] = b
+                if title == "流程 B 結果":
+                    self.analysis_outputs[rel] = b
+            for col in range(3):
+                box.columnconfigure(col, weight=1, uniform=title)
+        self.v_out.trace_add('write', lambda *args: self._refresh_analysis_outputs())
+        self._refresh_analysis_outputs()
+
+    def _wrap_to_width(self, label, container, margin=40):
+        """Keep a wrapping label as wide as its container so text is never cut off."""
+        container.bind('<Configure>', lambda e, lb=label, m=margin: lb.configure(wraplength=max(200, e.width - m)), add='+')
+
+    def _on_focus_in(self, event):
+        """Scroll the form so the focused control is visible (keyboard Tab must never land off-screen)."""
+        w = event.widget
+        try:
+            if not str(w).startswith(str(self.form_body)):
+                return
+            canvas = self.form_canvas
+            total = max(1, self.form_body.winfo_height())
+            top = w.winfo_rooty() - self.form_body.winfo_rooty()
+            bottom = top + w.winfo_height()
+            view_top = canvas.canvasy(0)
+            view_bottom = view_top + canvas.winfo_height()
+            if top < view_top:
+                canvas.yview_moveto(max(0.0, (top - 8) / total))
+            elif bottom > view_bottom:
+                canvas.yview_moveto(min(1.0, (bottom + 8 - canvas.winfo_height()) / total))
+        except tk.TclError:
+            pass
+
+    def _reveal(self, widget):
+        """Scroll a whole section (e.g. the results) into view."""
+        try:
+            self.root.update_idletasks()
+            total = max(1, self.form_body.winfo_height())
+            top = widget.winfo_rooty() - self.form_body.winfo_rooty()
+            self.form_canvas.yview_moveto(max(0.0, min(1.0, (top - 8) / total)))
+        except tk.TclError:
+            pass
 
     # ---------- helpers ----------
     def _select_analysis_files(self):
@@ -170,8 +259,12 @@ class App:
         self.v_analysis.set("使用上方輸入資料夾")
 
     def _refresh_analysis_outputs(self):
-        for rel, button in self.analysis_outputs.items():
-            button.configure(state="normal" if (Path(self.v_out.get()) / rel).is_file() and not self._busy() else "disabled")
+        """One entry per output file: enabled only when it exists (folder button: when the folder exists) and no run is active."""
+        out = Path(self.v_out.get().strip() or ".")
+        for rel, button in self.output_buttons.items():
+            target = out / rel if rel else out
+            exists = target.is_dir() if not rel else target.is_file()
+            button.configure(state="normal" if exists and not self._busy() else "disabled")
 
     def _start_analysis(self):
         if self._busy(): return
@@ -210,6 +303,7 @@ class App:
         self.v_result.set(f"{head}\n檔案：{result['total']}　成功：{result['ok']}　失敗：{result['failed']}　需檢視：{result['warnings']}\n" + result['fatal'])
         self.v_progress.set(100 if not result['stopped'] else self.v_progress.get())
         self._refresh_analysis_outputs()
+        self._reveal(self.result_frame)
 
     def _browse(self, var):
         d = filedialog.askdirectory(initialdir=var.get() or str(ROOT))
@@ -306,6 +400,7 @@ class App:
         if not r["accore_ok"]:
             self._log("ERROR", "accoreconsole NOT FOUND，無法開始處理")
         self.btn_start.configure(state="normal" if self.env_ok and not self._busy() else "disabled")
+        self.v_accore.set(f"accoreconsole 路徑：{r['accore'] or '未設定'}")
 
     # ---------- scan ----------
     def _scan(self):
@@ -346,6 +441,7 @@ class App:
         self.v_progress.set(0)
         self.v_ptext.set("")
         self.v_result.set("處理中...")
+        self.root.after(50, self._refresh_analysis_outputs)   # output buttons stay disabled while a run is active
 
         def work():
             try:
@@ -369,6 +465,7 @@ class App:
 
     def _on_done(self, s):
         self.summary = s
+        self.worker = None      # the worker has finished; lets the output buttons enable
         self.btn_scan.configure(state="normal")
         self.btn_stop.configure(state="disabled")
         self.btn_analysis.configure(state="normal")
@@ -394,6 +491,8 @@ class App:
             f"Suspect text records：{s['suspect_texts']}\n耗時：{pipeline.fmt_duration(s['elapsed'])}"
             + (f"\n錯誤：{s['fatal']}" if s["fatal"] else "")
             + (f"\n\n失敗檔案：\n{shown}" if failed_files else ""))
+        self._refresh_analysis_outputs()
+        self._reveal(self.result_frame)
 
     def _poll(self):
         try:
