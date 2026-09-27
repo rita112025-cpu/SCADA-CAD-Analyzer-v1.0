@@ -156,9 +156,79 @@ def test_gui_partial_failure_shows_warnings_not_total_failure(tk_root):
                         elapsed=3.0, stopped=False, fatal=""))
         text = a.v_result.get()
         assert "Completed with warnings" in text and "中止" not in text
-        assert "成功：99" in text and "失敗：1" in text and "跳過：0" in text
+        assert "成功：99" in text and "失敗：1" in text and "略過：0" in text   # vocabulary unified: 成功 / 略過 / 警告 / 失敗
         assert "bad.dwg" in text
         a._on_done(dict(dwg=3, ok=3, failed=0, skipped=0, failed_files=[], analyze_failed=0, dxf=3,
                         keyword_hits=0, unique_objects=0, suspect_texts=0, elapsed=1.0, stopped=False,
                         fatal=""))
         assert "Completed with warnings" not in a.v_result.get()
+
+
+# ---- outcome vocabulary (成功 / 略過 / 警告 / 失敗): text + symbol + colour, never colour alone ----
+def test_classify_outcome_states():
+    import app as appmod
+    c = appmod.classify_outcome
+    base = dict(fatal="", stopped=False, failed=0, ok=3, skipped=0, warnings=0, failed_files=[])
+    assert c(base)[0] == "success"
+    assert c(dict(base, failed=1, failed_files=["x.dwg: DXF_INVALID"]))[0] == "warning"          # partial failure
+    assert c(dict(base, ok=0, failed=2, failed_files=["a", "b"]))[0] == "failed"                # nothing succeeded
+    assert c(dict(base, fatal="boom"))[0] == "failed"
+    assert c(dict(base, stopped=True))[0] == "warning"
+    assert c(dict(base, warnings=2))[0] == "warning"
+    assert c(dict(base, ok=0, skipped=3))[0] == "skipped"
+    assert "Completed with warnings" in c(dict(base, failed=1, failed_files=["x"]))[1]
+
+
+def test_every_state_has_label_symbol_and_readable_contrast():
+    import app as appmod
+
+    def lum(h):
+        r, g, b = (int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
+        f = lambda v: v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+
+    def ratio(a, b):
+        la, lb = sorted((lum(a), lum(b)), reverse=True)
+        return (la + 0.05) / (lb + 0.05)
+    assert len({(v["label"], v["symbol"]) for v in appmod.STATE.values()}) >= 5
+    for name, v in appmod.STATE.items():
+        assert v["label"] and v["symbol"], name
+        assert ratio(v["fg"], v["bg"]) >= 7.0, (name, ratio(v["fg"], v["bg"]))          # banner text
+    for name, fg in appmod.LOG_FG.items():
+        assert ratio(fg, "#FFFFFF") >= 4.5, (name, ratio(fg, "#FFFFFF"))               # coloured log text on white
+
+
+@pytest.mark.parametrize("raw,expect", [
+    ("C:/in/bad.dwg: DXF_INVALID AutoCAD reported an error opening this DWG (invalid/corrupt file?)", "bad.dwg — 此 DWG 無法開啟或已損毀"),
+    ("big.dwg: DXF_INVALID timeout after 300s", "big.dwg — 轉檔逾時"),
+    ("C:/in/spec.pdf: SKIPPED_DEPENDENCY: ImportError: pdfplumber", "spec.pdf — 缺少選用套件"),
+    ("(analyze) x.dxf: ERROR: KeyError: 'a'", "分析階段：x.dxf — 處理失敗"),
+    ("plain text without a code", "plain text without a code"),
+])
+def test_friendly_failure(raw, expect):
+    import app as appmod
+    assert expect in appmod.friendly_failure(raw)
+
+
+def test_gui_banner_progress_and_log_colours(tk_root):
+    import app as appmod
+    root = tk_root
+    _fresh(root)
+    a = appmod.App(root)
+    ok = dict(dwg=3, ok=2, failed=1, skipped=0, failed_files=["C:/x/bad.dwg: DXF_INVALID corrupt file"], analyze_failed=0,
+              dxf=2, keyword_hits=0, unique_objects=0, suspect_texts=0, elapsed=1.0, stopped=False, fatal="")
+    a._on_done(ok)
+    st = appmod.STATE["warning"]
+    assert a.lbl_status.cget("bg") == st["bg"] and a.lbl_status.cget("fg") == st["fg"]
+    assert st["symbol"] in a.lbl_status.cget("text") and st["label"] in a.lbl_status.cget("text")
+    assert a.progress_bar._color == st["bar"]
+    assert "bad.dwg — 此 DWG 無法開啟或已損毀" in a.v_result.get()
+    a._on_done(dict(ok, failed=0, failed_files=[]))
+    assert appmod.STATE["success"]["label"] in a.lbl_status.cget("text")
+    assert a.progress_bar._color == appmod.STATE["success"]["bar"]
+    a._log("WARN", "w")
+    a._log("ERROR", "e")
+    a._log("OK", "o")
+    text = a.log_box.get("1.0", "end")
+    assert "⚠ 警告" in text and "✗ 失敗" in text and "✓ 成功" in text
+    assert a.log_box.tag_ranges("warning") and a.log_box.tag_ranges("failed") and a.log_box.tag_ranges("success")

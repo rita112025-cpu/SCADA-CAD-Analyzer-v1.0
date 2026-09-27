@@ -2,9 +2,11 @@
 import json
 import os
 import queue
+import re
 import sys
 import threading
 import tkinter as tk
+import tkinter.font as tkfont
 from pathlib import Path
 from tkinter import filedialog, messagebox, scrolledtext, ttk
 
@@ -19,6 +21,96 @@ try:  # crisp text on high-DPI Windows displays
     ctypes.windll.shcore.SetProcessDpiAwareness(1)
 except Exception:  # noqa: BLE001
     pass
+
+
+# ---------- one outcome vocabulary: 成功 / 略過 / 警告 / 失敗 (+ running / idle) ----------
+# Every state has a text label AND a symbol, so meaning never depends on colour alone.
+# Colours: dark text on a light tint (contrast well above 4.5:1); bar colours are mid-tone fills.
+STATE = {
+    "success": dict(label="成功", symbol="✓", bg="#E2F3E5", fg="#14532D", bar="#2E7D32"),
+    "skipped": dict(label="略過", symbol="–", bg="#E9EAEC", fg="#3B3F45", bar="#7A8088"),
+    "warning": dict(label="警告", symbol="⚠", bg="#FFF0C7", fg="#5F4100", bar="#C77C00"),
+    "failed": dict(label="失敗", symbol="✗", bg="#FADADA", fg="#7A1212", bar="#C62828"),
+    "running": dict(label="執行中", symbol="…", bg="#E1ECF8", fg="#123A66", bar="#2F6FB3"),
+    "idle": dict(label="尚未執行", symbol="–", bg="#EEEFF1", fg="#3B3F45", bar="#7A8088"),
+}
+LOG_STATE = {"OK": "success", "INFO": "idle", "WARN": "warning", "ERROR": "failed"}   # backend log level -> state
+LOG_TEXT = {"OK": "✓ 成功", "INFO": "· 資訊", "WARN": "⚠ 警告", "ERROR": "✗ 失敗"}
+LOG_FG = {"success": "#1B6E2C", "warning": "#8A5A00", "failed": "#B3261E"}                # on white, contrast >= 5.5:1
+
+
+def classify_outcome(s):
+    """Run summary -> (state, one-line verdict). Partial failure is a warning, not a failure and not a success."""
+    failed = int(s.get("failed", 0) or 0) + int(s.get("analyze_failed", 0) or 0)
+    ok = int(s.get("ok", 0) or 0)
+    if s.get("fatal"):
+        return "failed", "處理中止（嚴重錯誤）"
+    if s.get("stopped"):
+        return "warning", "已停止（結果不完整）"
+    if failed or s.get("failed_files"):
+        if ok > 0 or int(s.get("skipped", 0) or 0) > 0:
+            return "warning", "部分完成（Completed with warnings）：其餘檔案已完成，失敗的檔案見下方"
+        return "failed", "全部失敗：沒有任何檔案處理成功"
+    if int(s.get("warnings", 0) or 0):
+        return "warning", "已完成，但有檔案需要檢視（缺少選用套件或需 OCR）"
+    if ok == 0 and int(s.get("skipped", 0) or 0):
+        return "skipped", "全部略過（輸出已存在）"
+    return "success", "全部完成"
+
+
+_CODES = (
+    ("DXF_INVALID", "corrupt", "此 DWG 無法開啟或已損毀；請在 AutoCAD 開啟後另存，再重跑"),
+    ("DXF_INVALID", "timeout", "轉檔逾時；圖面可能過大或 AutoCAD 沒有回應"),
+    ("DXF_INVALID", "", "轉出的 DXF 無效（詳見 errors.log）"),
+    ("SKIPPED_DEPENDENCY", "", "缺少選用套件，已略過（安裝方式見 README）"),
+    ("UNSUPPORTED_FORMAT", "", "不支援的檔案格式"),
+    ("SOURCE_MODIFIED", "", "來源檔案在處理中被改變，結果不可信"),
+    ("FAILED", "", "處理失敗（詳見 errors.log）"),
+    ("ERROR", "", "處理失敗（詳見 errors.log）"),
+)
+_CODE_RE = re.compile(r"\b(DXF_INVALID|SKIPPED_DEPENDENCY|UNSUPPORTED_FORMAT|SOURCE_MODIFIED|FAILED|ERROR)\b")
+
+
+def friendly_failure(item):
+    """'C:\\x\\a.dwg: DXF_INVALID ...' -> 'a.dwg — 此 DWG 無法開啟…'. Raw text stays in errors.log."""
+    text = str(item)
+    m = _CODE_RE.search(text)
+    if not m:
+        return text
+    name = text[:m.start()].rstrip(": ").strip()
+    prefix = ""
+    for tag, label in (("(analyze)", "分析階段"), ("(search)", "搜尋階段")):
+        if name.startswith(tag):
+            prefix, name = label + "：", name[len(tag):].strip()
+    name = re.split(r"[\\/]", name)[-1] or name
+    lowered = text.lower()
+    for code, needle, message in _CODES:
+        if code == m.group(1) and (not needle or needle in lowered):
+            return f"{prefix}{name} — {message}"
+    return f"{prefix}{name} — {text[m.start():]}"
+
+
+class ProgressBar(tk.Canvas):
+    """Progress bar whose fill colour follows the run outcome (ttk's native bar cannot be recoloured)."""
+
+    def __init__(self, master, variable):
+        super().__init__(master, height=18, highlightthickness=1, highlightbackground="#B8BCC2", bg="#F1F2F4")
+        self._var, self._color = variable, STATE["running"]["bar"]
+        variable.trace_add("write", lambda *a: self._draw())
+        self.bind("<Configure>", lambda e: self._draw())
+
+    def set_color(self, color):
+        self._color = color
+        self._draw()
+
+    def _draw(self):
+        self.delete("all")
+        try:
+            pct = max(0.0, min(100.0, float(self._var.get() or 0)))
+        except (tk.TclError, ValueError):
+            pct = 0.0
+        if pct > 0:
+            self.create_rectangle(0, 0, self.winfo_width() * pct / 100.0, self.winfo_height(), fill=self._color, width=0)
 
 
 class App:
@@ -170,20 +262,31 @@ class App:
         pf.pack(fill="x", padx=6, pady=(4, 0))
         self.btn_stop = ttk.Button(pf, text="停止 Stop", command=self._stop, state="disabled")
         self.btn_stop.pack(side="left")
-        ttk.Progressbar(pf, variable=self.v_progress, maximum=100).pack(side="left", fill="x", expand=True, padx=8)
+        self.progress_bar = ProgressBar(pf, self.v_progress)
+        self.progress_bar.pack(side="left", fill="x", expand=True, padx=8)
         ttk.Label(pf, textvariable=self.v_ptext, width=34).pack(side="left")
         cur = ttk.Label(st, textvariable=self.v_current, anchor="w", wraplength=760, justify="left")
         cur.pack(fill="x", padx=8)
         self._wrap_to_width(cur, st)
         self.log_box = scrolledtext.ScrolledText(st, height=6, state="disabled", font=("Consolas", 9))
         self.log_box.pack(fill="both", expand=True, padx=6, pady=6)
+        for state, color in LOG_FG.items():
+            self.log_box.tag_configure(state, foreground=color)
 
         # ---- 4 結果 ----
         rf = ttk.LabelFrame(main, text="④ 結果　Results")
         rf.pack(fill="x", **pad)
         self.result_frame = rf
-        self.v_result = tk.StringVar(value="尚未執行")
-        lr = ttk.Label(rf, textvariable=self.v_result, justify="left", wraplength=760)
+        # outcome banner: symbol + word + colour. Regular weight: bold falls back to a synthetic face for some CJK glyphs.
+        self.lbl_status = tk.Label(rf, anchor="w", justify="left", padx=10, pady=6, wraplength=700,
+                                   font=(tkfont.nametofont("TkDefaultFont").actual("family"), 10))
+        self.lbl_status.pack(fill="x", padx=8, pady=(4, 2))
+        self._wrap_to_width(self.lbl_status, rf, margin=50)
+        self._set_status("idle", "尚未執行")
+        self.v_result = tk.StringVar(value="尚未執行")       # full summary text (first line = the verdict)
+        self.v_result_body = tk.StringVar(value="尚未執行")  # what is shown under the banner: without the repeated verdict
+        self.v_result.trace_add("write", lambda *a: self.v_result_body.set(self._result_body(self.v_result.get())))
+        lr = ttk.Label(rf, textvariable=self.v_result_body, justify="left", wraplength=760)
         lr.pack(fill="x", padx=8, pady=2)
         self._wrap_to_width(lr, rf)
         # one entry per output file; enabled only once the file exists
@@ -277,6 +380,7 @@ class App:
         self.stop_event.clear()
         self.summary = None
         self.v_result.set("分析中...")
+        self._set_status("running", "分析工程資料中…")
         self.v_progress.set(0)
         for b in (self.btn_start, self.btn_scan, self.btn_analysis, self.btn_files, self.btn_folder): b.configure(state="disabled")
         self.btn_stop.configure(state="normal")
@@ -299,8 +403,17 @@ class App:
         for b in (self.btn_scan, self.btn_analysis, self.btn_files, self.btn_folder): b.configure(state="normal")
         self.btn_start.configure(state="normal" if self.env_ok else "disabled")
         self.btn_stop.configure(state="disabled")
-        head = '處理中止' if result['fatal'] else ('已停止' if result['stopped'] else ('Completed with warnings' if result['failed'] or result['warnings'] else '分析完成'))
-        self.v_result.set(f"{head}\n檔案：{result['total']}　成功：{result['ok']}　失敗：{result['failed']}　需檢視：{result['warnings']}\n" + result['fatal'])
+        state, verdict = classify_outcome(result)
+        st = STATE[state]
+        failed_files = result.get('failed_files', [])
+        shown = "\n".join(f"  - {friendly_failure(x)}" for x in failed_files[:8])
+        if len(failed_files) > 8:
+            shown += f"\n  ... 另有 {len(failed_files) - 8} 個（見 errors.log）"
+        self.v_result.set(f"{st['symbol']} {st['label']}：{verdict}\n"
+                          f"檔案：{result['total']}　成功：{result['ok']}　失敗：{result['failed']}　"
+                          f"略過：{result.get('skipped', 0)}　警告：{result['warnings']}\n" + result['fatal']
+                          + (f"\n\n失敗檔案：\n{shown}" if failed_files else ""))
+        self._set_status(state, verdict)
         self.v_progress.set(100 if not result['stopped'] else self.v_progress.get())
         self._refresh_analysis_outputs()
         self._reveal(self.result_frame)
@@ -330,11 +443,26 @@ class App:
         except OSError as e:
             messagebox.showerror("儲存失敗", str(e))
 
+    @staticmethod
+    def _result_body(text):
+        """The banner already states the verdict; show the rest of the summary (counts, failed files) below it."""
+        lines = text.split("\n")
+        rest = "\n".join(lines[1:]).lstrip("\n")
+        return rest if len(lines) > 1 and rest else text
+
+    def _set_status(self, state, text):
+        """Outcome banner in the results section: symbol + word + colour (never colour alone)."""
+        st = STATE[state]
+        self.lbl_status.configure(text=f"{st['symbol']} {st['label']}　{text}" if state != "idle" else f"{st['symbol']} {text}",
+                                  bg=st["bg"], fg=st["fg"])
+        self.progress_bar.set_color(st["bar"])
+
     def _log(self, level, msg):
         import datetime
-        line = f"[{datetime.datetime.now():%H:%M:%S}] {level:<5} {msg}\n"
+        state = LOG_STATE.get(level, "idle")
+        line = f"[{datetime.datetime.now():%H:%M:%S}] {LOG_TEXT.get(level, level):<6} {msg}\n"
         self.log_box.configure(state="normal")
-        self.log_box.insert("end", line)
+        self.log_box.insert("end", line, state if state in LOG_FG else ())
         self.log_box.see("end")
         self.log_box.configure(state="disabled")
 
@@ -441,6 +569,7 @@ class App:
         self.v_progress.set(0)
         self.v_ptext.set("")
         self.v_result.set("處理中...")
+        self._set_status("running", "DWG 轉 DXF＋解析中…")
         self.root.after(50, self._refresh_analysis_outputs)   # output buttons stay disabled while a run is active
 
         def work():
@@ -470,27 +599,22 @@ class App:
         self.btn_stop.configure(state="disabled")
         self.btn_analysis.configure(state="normal")
         self.btn_start.configure(state="normal" if self.env_ok else "disabled")
-        if s["fatal"]:
-            head = "處理中止（嚴重錯誤）"
-        elif s["stopped"]:
-            head = "已停止"
-        elif s.get("failed_files"):
-            head = "Completed with warnings（部分檔案失敗，其餘已完成）"
-            self.v_progress.set(100)
-        else:
-            head = "處理完成"
+        state, verdict = classify_outcome(s)
+        head = f"{STATE[state]['symbol']} {STATE[state]['label']}：{verdict}"
+        if not s["fatal"] and not s["stopped"]:
             self.v_progress.set(100)
         failed_files = s.get("failed_files", [])
-        shown = "\n".join(f"  - {x}" for x in failed_files[:8])
+        shown = "\n".join(f"  - {friendly_failure(x)}" for x in failed_files[:8])
         if len(failed_files) > 8:
             shown += f"\n  ... 另有 {len(failed_files) - 8} 個（見 errors.log）"
         self.v_result.set(
-            f"{head}\n\nDWG：{s['dwg']}\n成功：{s['ok']}\n失敗：{s['failed']}\n跳過：{s.get('skipped', 0)}\n"
+            f"{head}\n\nDWG：{s['dwg']}\n成功：{s['ok']}\n失敗：{s['failed']}\n略過：{s.get('skipped', 0)}\n"
             f"分析失敗：{s.get('analyze_failed', 0)}\nDXF：{s['dxf']}\n"
             f"Keyword Hits：{s['keyword_hits']}\nUnique Matched Objects：{s['unique_objects']}\n"
             f"Suspect text records：{s['suspect_texts']}\n耗時：{pipeline.fmt_duration(s['elapsed'])}"
             + (f"\n錯誤：{s['fatal']}" if s["fatal"] else "")
             + (f"\n\n失敗檔案：\n{shown}" if failed_files else ""))
+        self._set_status(state, verdict)
         self._refresh_analysis_outputs()
         self._reveal(self.result_frame)
 
