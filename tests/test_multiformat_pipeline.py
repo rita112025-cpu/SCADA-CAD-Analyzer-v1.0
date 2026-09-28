@@ -145,3 +145,32 @@ def test_export_failure_keeps_previous_publication(tmp_path, engineering_cfg, mo
     assert len(calls) >= 5
     assert _snapshot(out) == before
     assert not list((out / 'database').glob('project_*.db'))
+
+
+@pytest.mark.parametrize('prior', [True, False], ids=['previous-output', 'fresh-output'])
+@pytest.mark.parametrize('fail_at', [2, 'project.db'], ids=['2nd-file', 'project.db'])
+def test_publish_move_failure_restores_previous_output(tmp_path, engineering_cfg, monkeypatch, prior, fail_at):
+    """Fault injection: a failing os.replace while publishing must restore every output file, leave no staging/backup/temp files, and report the error."""
+    import os
+    inp = tmp_path / 'input'; inp.mkdir(); p = inp / 'boq.csv'
+    p.write_text('Item,Model,Qty\n1,RTU01,2\n')
+    out = tmp_path / 'out'; cfg = dict(engineering_cfg, input_dir=str(inp), output_dir=str(out))
+    if prior: run_multiformat(cfg)
+    before = _snapshot(out) if prior else {}
+    p.write_text('Item,Model,Qty\n1,PLC99,7\n2,UPS02,3\n')
+    real, forward = os.replace, []
+    def flaky(src, dst, *a, **k):
+        src, dst = Path(src), Path(dst)
+        if ('new' in src.parts and any(x.startswith('.publish_') for x in src.parts)) or (dst.name == 'project.db' and src.name.startswith('project_')):
+            forward.append(dst)   # publishing a new file; backup and restore moves are not counted
+            if dst.name == 'project.db' if fail_at == 'project.db' else len(forward) == fail_at:
+                raise PermissionError(13, 'injected publish failure', str(dst))
+        return real(src, dst, *a, **k)
+    monkeypatch.setattr(os, 'replace', flaky)
+    with pytest.raises(PermissionError, match='injected publish failure'):
+        run_multiformat(cfg)
+    monkeypatch.undo()
+    assert len(forward) >= 2
+    assert _snapshot(out) == before
+    assert not list((out / 'database').glob('project_*.db'))
+    assert not [p for p in out.iterdir() if p.name.startswith('.publish_')]

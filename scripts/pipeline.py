@@ -103,18 +103,17 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
             for row in compare_boq(old, new): store.report('excel/boq_compare.csv', row)
         store.db.commit()
         staging = Path(tempfile.mkdtemp(prefix='.publish_', dir=out))
+        keep_staging = False
         try:
-            store.export(staging)
-            _empty_reports(staging, store)
+            store.export(staging / 'new')
+            _empty_reports(staging / 'new', store)
             store.db.close()
-            # Publish only after every report was written: a failed export leaves the previous CSVs + project.db untouched.
-            for src in sorted(p for p in staging.rglob('*') if p.is_file()):
-                dest = out / src.relative_to(staging)
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(src, dest)
+            _publish(staging, out, Path(temporary), dbdir / 'project.db')
+        except _RollbackIncomplete:
+            keep_staging = True   # originals still sit in staging/old; do not delete them
+            raise
         finally:
-            shutil.rmtree(staging, ignore_errors=True)
-        os.replace(temporary, dbdir / 'project.db')
+            if not keep_staging: shutil.rmtree(staging, ignore_errors=True)
     except BaseException:
         store.db.close()
         Path(temporary).unlink(missing_ok=True)
@@ -122,6 +121,45 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
     summary.update(elapsed=time.time()-start, exit_code=int(bool(summary['failed'] or summary['warnings'] or summary['stopped'])))
     log('WARN' if summary['exit_code'] else 'OK', 'Completed with warnings' if summary['exit_code'] else 'Completed')
     return summary
+
+
+class _RollbackIncomplete(RuntimeError):
+    pass
+
+
+def _publish(staging, out, temp_db, final_db):
+    """Move staged reports, then project.db last, into out. Existing files are moved aside first;
+    a failing move restores them and removes new files, so out is left as it was. A process kill
+    skips the restore (staging/old keeps the originals)."""
+    import os
+    moves = [(src, out / src.relative_to(staging / 'new')) for src in sorted(p for p in (staging / 'new').rglob('*') if p.is_file())]
+    moves.append((temp_db, final_db))
+    done, made_dirs = [], []
+    try:
+        for src, dest in moves:
+            for d in reversed([dest.parent, *dest.parent.parents]):
+                if not d.exists(): d.mkdir(); made_dirs.append(d)
+            backup = None
+            if dest.exists():
+                backup = staging / 'old' / dest.relative_to(out)
+                backup.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(dest, backup)
+            done.append((dest, backup))   # recorded before the move so a failed move still restores the original
+            os.replace(src, dest)
+    except BaseException as exc:
+        errors = []
+        for dest, backup in reversed(done):
+            try:
+                if backup: os.replace(backup, dest)
+                else: dest.unlink(missing_ok=True)
+            except OSError as e:
+                errors.append(f'{dest}: {e}')
+        for d in reversed(made_dirs):
+            try: d.rmdir()
+            except OSError: pass
+        if errors:
+            raise _RollbackIncomplete(f'Publish failed ({type(exc).__name__}: {exc}) and {len(errors)} file(s) could not be restored; originals kept in {staging / "old"}: ' + '; '.join(errors)) from exc
+        raise
 
 
 def _empty_reports(out, store):
