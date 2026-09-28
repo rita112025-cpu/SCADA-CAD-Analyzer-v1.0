@@ -123,6 +123,28 @@ def test_qty_ambiguous_space_keeps_raw_text_and_warns():
     assert "space" in rows[1]["parse_warnings"][0]
 
 
+HEAD_QUOTE = ["項次", "品名規格", "單 位", "數 量", "單 價", "小 計", "", "備 註"]
+
+
+def test_header_accepts_combined_name_and_spec_column():
+    """'品名規格' (name + spec in one column) is a description; spaces inside header cells are ignored."""
+    assert pdf_boq.map_header(HEAD_QUOTE) == dict(item_no=0, description=1, unit=2, qty=3, remarks=7)
+    assert pdf_boq.map_header(["品名", "規格", "數量"]) == dict(description=0, spec=1, qty=2)     # unchanged
+
+
+def test_quotation_table_with_title_row_and_odd_quantity():
+    table = [["報價細項表 某公司", "", "", "", "", "", "", ""],
+             HEAD_QUOTE,
+             ["1", "Phase01 installation design", "station", "7.00)", "NT$713,111.00", "NT$4,991,777.00", "", "note"],
+             ["1-1", "Cable plan", "", "", "", "", "", ""]]
+    rows, skipped = pdf_boq.rows_from_tables([(1, [table])])
+    assert [(r["row"], r["item_no"], r["description"], r["unit"]) for r in rows] == [
+        (3, "1", "Phase01 installation design", "station"), (4, "1-1", "Cable plan", "")]
+    assert rows[0]["qty"] is None and rows[0]["qty_text"] == "7.00)"    # not guessed as 7.00
+    assert rows[0]["parse_warnings"]
+    assert [(k["row"], k["reason"]) for k in skipped] == [(1, "row before the BOQ header")]
+
+
 # ---------------- B1 / B2 / B3 ----------------
 def test_b1_single_table_one_page(tmp_path, data_store, engineering_cfg):
     p = make_pdf(tmp_path / "b.pdf", [[[HEAD, ["1", "RTU cabinet", "IP65", "set", "2", "see RTU-01"],

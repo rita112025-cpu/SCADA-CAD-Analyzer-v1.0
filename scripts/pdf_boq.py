@@ -16,7 +16,7 @@ import re
 # header aliases (casefolded, whitespace removed). Overridable with config["pdf_boq_aliases"].
 DEFAULT_ALIASES = {
     "item_no": ["項次", "項目編號", "編號", "item", "itemno", "item no", "no", "no.", "s/n", "序號"],
-    "description": ["說明", "品名", "項目", "工作項目", "名稱", "物件名稱", "description", "item description", "設備名稱"],
+    "description": ["說明", "品名", "項目", "工作項目", "名稱", "物件名稱", "品名規格", "description", "item description", "設備名稱"],
     "spec": ["規格", "型式", "規範", "specification", "spec", "model"],
     "unit": ["單位", "unit", "uom"],
     "qty": ["數量", "qty", "qty.", "quantity"],
