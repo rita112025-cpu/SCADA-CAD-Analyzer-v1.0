@@ -21,6 +21,7 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
     import importlib
     import json
     import os
+    import shutil
     import tempfile
     from engineering_data import Store, digest, evidence, UnsupportedFormat
     import cross_reference
@@ -101,9 +102,18 @@ def run_multiformat(cfg, inputs=None, log=None, progress=None, stop_event=None, 
                 raise ValueError('BOQ revision comparison requires exactly one new BOQ source; select that file explicitly')
             for row in compare_boq(old, new): store.report('excel/boq_compare.csv', row)
         store.db.commit()
-        store.export(out)
-        _empty_reports(out, store)
-        store.db.close()
+        staging = Path(tempfile.mkdtemp(prefix='.publish_', dir=out))
+        try:
+            store.export(staging)
+            _empty_reports(staging, store)
+            store.db.close()
+            # Publish only after every report was written: a failed export leaves the previous CSVs + project.db untouched.
+            for src in sorted(p for p in staging.rglob('*') if p.is_file()):
+                dest = out / src.relative_to(staging)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(src, dest)
+        finally:
+            shutil.rmtree(staging, ignore_errors=True)
         os.replace(temporary, dbdir / 'project.db')
     except BaseException:
         store.db.close()

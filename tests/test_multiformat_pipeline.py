@@ -119,3 +119,29 @@ def test_invalid_csv_is_isolated_and_xml_rollback(tmp_path, engineering_cfg):
     assert result['failed'] == 2 and result['ok'] == 1
     with sqlite3.connect(out / 'database/project.db') as db:
         assert db.execute('SELECT count(*) FROM clashes').fetchone()[0] == 0
+
+
+def _snapshot(out):
+    return {p.relative_to(out).as_posix(): p.read_bytes() for p in out.rglob('*') if p.is_file() and 'logs' not in p.relative_to(out).parts}
+
+
+def test_export_failure_keeps_previous_publication(tmp_path, engineering_cfg, monkeypatch):
+    """Fault injection: a failure mid-export must leave CSVs and project.db as the previous consistent run."""
+    import engineering_data
+    inp = tmp_path / 'input'; inp.mkdir(); p = inp / 'boq.csv'
+    p.write_text('Item,Model,Qty\n1,RTU01,2\n')
+    out = tmp_path / 'out'; cfg = dict(engineering_cfg, input_dir=str(inp), output_dir=str(out))
+    run_multiformat(cfg)
+    before = _snapshot(out)
+    p.write_text('Item,Model,Qty\n1,PLC99,7\n2,UPS02,3\n')
+    real, calls = engineering_data.Store._csv, []
+    def flaky(path, rows, fields):
+        calls.append(path)
+        if len(calls) == 5: raise OSError('injected export failure')
+        return real(path, rows, fields)
+    monkeypatch.setattr(engineering_data.Store, '_csv', staticmethod(flaky))
+    with pytest.raises(OSError, match='injected'):
+        run_multiformat(cfg)
+    assert len(calls) >= 5
+    assert _snapshot(out) == before
+    assert not list((out / 'database').glob('project_*.db'))
