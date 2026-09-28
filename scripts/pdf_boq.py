@@ -16,14 +16,19 @@ import re
 # header aliases (casefolded, whitespace removed). Overridable with config["pdf_boq_aliases"].
 DEFAULT_ALIASES = {
     "item_no": ["項次", "項目編號", "編號", "item", "itemno", "item no", "no", "no.", "s/n", "序號"],
-    "description": ["說明", "品名", "項目", "工作項目", "名稱", "description", "item description", "設備名稱"],
+    "description": ["說明", "品名", "項目", "工作項目", "名稱", "物件名稱", "description", "item description", "設備名稱"],
     "spec": ["規格", "型式", "規範", "specification", "spec", "model"],
     "unit": ["單位", "unit", "uom"],
     "qty": ["數量", "qty", "qty.", "quantity"],
     "remarks": ["備註", "remarks", "remark", "note", "notes"],
 }
+# '項目' is often the item-number column; it only serves as the description when no other name column exists.
+WEAK_DESCRIPTION = {"項目"}
+SUMMARY_PREFIXES = ("小計", "合計", "總計", "總價", "總工程款", "含稅", "稅額", "營業稅", "加值型營業稅")
+SUMMARY_EN = re.compile(r"^(sub-?total|grand total|total)\s*[:：]?$", re.I)   # exact only: 'Total station' is an item
 TAG_RE = re.compile(r"\b[A-Z]{2,6}[-_]\d[\w-]*\b")
 NUM_RE = re.compile(r"^-?\d[\d,]*(\.\d+)?$")
+THOUSANDS_RE = re.compile(r"^-?\d{1,3}(,\d{3})+(\.\d+)?$")
 
 
 def _norm(s):
@@ -38,21 +43,37 @@ def map_header(row, aliases=None):
     """{field: column index} when the row is a BOQ header (needs at least description and qty), else None."""
     aliases = aliases or DEFAULT_ALIASES
     lookup = {f: {_norm(a) for a in names} for f, names in aliases.items()}
-    found = {}
+    found, weak = {}, None
     for idx, cell in enumerate(row):
         n = _norm(cell)
         if not n:
             continue
         for field, names in lookup.items():
-            if field not in found and n in names:
-                found[field] = idx
+            if n in names:
+                if field == "description" and n in WEAK_DESCRIPTION:
+                    weak = idx if weak is None else weak
+                elif field not in found:
+                    found[field] = idx
                 break
+    if weak is not None:
+        found.setdefault("description" if "description" not in found else "item_no", weak)
     return found if "description" in found and "qty" in found else None
 
 
 def parse_qty(text):
+    """Plain numbers only. A space touching a thousands comma ('1 ,806', a PDF text-layer artifact) is restored;
+    a space between digits ('8 00') is ambiguous and stays unparsed."""
     t = (text or "").strip()
-    return float(t.replace(",", "")) if NUM_RE.match(t) else None
+    if NUM_RE.match(t):
+        return float(t.replace(",", ""))
+    compact = re.sub(r"\s*,\s*", ",", t)
+    if compact != t and THOUSANDS_RE.match(compact):
+        return float(compact.replace(",", ""))
+    return None
+
+
+def _is_summary(desc):
+    return re.sub(r"\s+", "", desc).startswith(SUMMARY_PREFIXES) or bool(SUMMARY_EN.match(desc.strip()))
 
 
 def rows_from_tables(pages, aliases=None):
@@ -91,9 +112,22 @@ def rows_from_tables(pages, aliases=None):
                 if not desc:
                     skipped.append(dict(page=page_no, table=table_no, row=r_idx, reason="empty description", cells=cells))
                     continue
+                if _is_summary(desc):
+                    skipped.append(dict(page=page_no, table=table_no, row=r_idx, reason="summary row (subtotal/total)", cells=cells))
+                    continue
+                ids = [get(f) for f in ("item_no", "unit", "qty") if f in hmap]
+                if len(ids) >= 2 and not any(ids):
+                    skipped.append(dict(page=page_no, table=table_no, row=r_idx,
+                                        reason="heading row (no item no, unit or quantity)", cells=cells))
+                    continue
                 qty_text = get("qty")
                 qty = parse_qty(qty_text)
-                warnings = [] if qty is not None else [f"quantity is not a plain number: {qty_text!r}"]
+                if qty is not None:
+                    warnings = []
+                elif re.fullmatch(r"[\d\s,.]+", qty_text) and re.search(r"\d\s+\d", qty_text):
+                    warnings = [f"quantity has a space inside the number; not restored: {qty_text!r}"]
+                else:
+                    warnings = [f"quantity is not a plain number: {qty_text!r}"]
                 tags = TAG_RE.findall(" ".join([desc, get("spec"), get("remarks")]))
                 rows.append(dict(page=page_no, table=table_no, row=r_idx, item_no=get("item_no"), description=desc,
                                  spec=get("spec"), unit=get("unit"), qty=qty, qty_text=qty_text,

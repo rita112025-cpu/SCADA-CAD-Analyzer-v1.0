@@ -69,6 +69,60 @@ def test_qty_parse():
     assert pdf_boq.parse_qty("TBD") is None and pdf_boq.parse_qty("約 5") is None and pdf_boq.parse_qty("") is None
 
 
+# ---------------- item column vs name column, summary/heading rows, spaced numbers (synthetic) ----------------
+HEAD_ZH = ["項目", "物件名稱", "規格", "單位", "數量", "總價", "備註"]
+HEAD_ZH10 = ["項目", "物件名稱", "規格", "單位", "數量", "材料", "工資", "材料", "工資", "備註"]
+
+
+def test_header_prefers_object_name_over_item_column():
+    """'項目' is both an item-number column and a weak name alias: a dedicated name column must win, and '項目' becomes item_no."""
+    assert pdf_boq.map_header(HEAD_ZH) == dict(item_no=0, description=1, spec=2, unit=3, qty=4, remarks=6)
+    assert pdf_boq.map_header(HEAD_ZH10) == dict(item_no=0, description=1, spec=2, unit=3, qty=4, remarks=9)
+    assert pdf_boq.map_header(["項目", "數量"]) == dict(description=0, qty=1)      # weak alias still works when it is the only name
+    assert pdf_boq.map_header(["項目", "品名", "數量"]) == dict(item_no=0, description=1, qty=2)
+
+
+def test_summary_and_heading_rows_are_not_items():
+    table = [HEAD_ZH10[:5] + ["備註"],
+             ["", "A - 設備室", "", "", "", ""],                          # section heading: no item no / unit / qty
+             ["1.1-1", "線槽", "100W", "M", "57", "ASI"],
+             ["1.1-2", "T接頭", "600W", "PCs", "-", ""],                  # real item with a blank quantity: kept, with a warning
+             ["", "小計", "", "", "", ""],
+             ["", "總價 (材料/工資)", "", "", "", ""],
+             ["", "總工程款 (未含加值型營業稅)", "", "", "", ""],
+             ["", "G-雜項費用 (運輸 / 保險)", "", "", "", "0.23"],
+             ["2", "Total station", "", "set", "1", ""],                  # 'Total ...' as an item name is NOT a summary row
+             ["", "Total", "", "", "", ""]]
+    rows, skipped = pdf_boq.rows_from_tables([(3, [table])])
+    assert [(r["row"], r["item_no"], r["description"]) for r in rows] == [
+        (3, "1.1-1", "線槽"), (4, "1.1-2", "T接頭"), (9, "2", "Total station")]
+    assert rows[1]["parse_warnings"]                                      # '-' is not a plain number
+    why = {k["row"]: k["reason"] for k in skipped}
+    assert [(k["page"], k["table"]) for k in skipped] == [(3, 1)] * 6
+    assert set(why) == {2, 5, 6, 7, 8, 10}
+    assert "heading" in why[2] and "heading" in why[8]
+    assert all("summary" in why[i] for i in (5, 6, 7, 10))
+
+
+def test_qty_thousands_separator_with_stray_space():
+    """PDF text layers sometimes emit '1 ,806' for 1,806. Only a space touching a thousands comma is restored."""
+    assert pdf_boq.parse_qty("1 ,806") == 1806.0
+    assert pdf_boq.parse_qty("1, 806") == 1806.0
+    assert pdf_boq.parse_qty("12 ,345.5") == 12345.5
+    assert pdf_boq.parse_qty("1 ,80") is None        # not a valid thousands group: keep raw
+    assert pdf_boq.parse_qty("8 00") is None          # digit-space-digit is ambiguous: keep raw
+    assert pdf_boq.parse_qty("1 33.4") is None
+    assert pdf_boq.parse_qty("1,806") == 1806.0 and pdf_boq.parse_qty("57") == 57.0
+
+
+def test_qty_ambiguous_space_keeps_raw_text_and_warns():
+    table = [["Item", "Description", "Unit", "Qty"], ["1", "Cable", "M", "1 ,806"], ["2", "Duct", "M", "8 00"]]
+    rows, _ = pdf_boq.rows_from_tables([(1, [table])])
+    assert (rows[0]["qty"], rows[0]["qty_text"], rows[0]["parse_warnings"]) == (1806.0, "1 ,806", [])
+    assert rows[1]["qty"] is None and rows[1]["qty_text"] == "8 00"
+    assert "space" in rows[1]["parse_warnings"][0]
+
+
 # ---------------- B1 / B2 / B3 ----------------
 def test_b1_single_table_one_page(tmp_path, data_store, engineering_cfg):
     p = make_pdf(tmp_path / "b.pdf", [[[HEAD, ["1", "RTU cabinet", "IP65", "set", "2", "see RTU-01"],
