@@ -22,6 +22,13 @@ try:  # crisp text on high-DPI Windows displays
 except Exception:  # noqa: BLE001
     pass
 
+try:  # own taskbar identity, so Windows shows our icon instead of pythonw's
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("SCADA.DWGAnalyzer")
+except Exception:  # noqa: BLE001
+    pass
+
+ICON = ROOT / "dwg_analysis.ico"
+
 
 # ---------- one outcome vocabulary: 成功 / 略過 / 警告 / 失敗 (+ running / idle) ----------
 # Every state has a text label AND a symbol, so meaning never depends on colour alone.
@@ -656,6 +663,11 @@ class App:
 
 def main():
     root = tk.Tk()
+    if ICON.exists():
+        try:  # default=: Toplevel dialogs inherit the icon too
+            root.iconbitmap(default=str(ICON))
+        except tk.TclError:
+            pass
     app = App(root)
 
     def on_close():
