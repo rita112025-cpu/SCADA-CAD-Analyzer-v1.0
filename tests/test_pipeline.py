@@ -42,10 +42,12 @@ def sample_dxf(tmp_path_factory):
     return out
 
 
+@pytest.mark.accore
 def test_01_accoreconsole_found():
     assert Path(ACCORE).is_file()
 
 
+@pytest.mark.accore
 def test_02_accoreconsole_runs(tmp_path):
     scr = tmp_path / "h.scr"
     scr.write_text('(princ "\\nOK_MARK\\n")\nQUIT\nY\n')
@@ -54,11 +56,13 @@ def test_02_accoreconsole_runs(tmp_path):
     assert cp.returncode == 0
 
 
+@pytest.mark.accore
 def test_03_04_convert_and_ezdxf_read(sample_dxf):
     assert validate_dxf(sample_dxf) == ("DXF_VALID", "")
     assert ezdxf.readfile(str(sample_dxf)).dxfversion == "AC1032"
 
 
+@pytest.mark.accore
 def test_05_06_08_chinese_and_space_path_source_untouched(tmp_path, cfg):
     d = tmp_path / "中文 路徑"
     d.mkdir()
@@ -71,6 +75,7 @@ def test_05_06_08_chinese_and_space_path_source_untouched(tmp_path, cfg):
     assert sha(src) == before
 
 
+@pytest.mark.accore
 def test_07_duplicate_names_in_batch(cfg):
     inp = Path(cfg["input_dir"])
     for sub in ("", "sub"):
@@ -81,6 +86,7 @@ def test_07_duplicate_names_in_batch(cfg):
     assert (out / "a.dxf").exists() and (out / "sub" / "a.dxf").exists()
 
 
+@pytest.mark.accore
 def test_09_no_overwrite_existing_dxf(tmp_path, cfg):
     out = tmp_path / "x.dxf"
     out.write_text("SENTINEL")
@@ -89,6 +95,7 @@ def test_09_no_overwrite_existing_dxf(tmp_path, cfg):
     assert out.read_text() == "SENTINEL"
 
 
+@pytest.mark.accore
 def test_10_to_13_parse(sample_dxf, cfg):
     res, info = analyze_dxf.analyze(sample_dxf, "sample.dxf")
     types = {t["entity_type"] for t in res["texts"]}
@@ -101,6 +108,7 @@ def test_10_to_13_parse(sample_dxf, cfg):
     assert any(l["layer"] == "SCADA_TEST" and l["entity_count"] > 0 for l in res["layers"])
 
 
+@pytest.mark.accore
 def test_14_keyword_search(sample_dxf):
     rules = find_scada.scada_rules.build_rules(CFG)
     rows, _ = find_scada.search_doc(ezdxf.readfile(str(sample_dxf)), "s.dxf", rules)
@@ -112,6 +120,7 @@ def test_14_keyword_search(sample_dxf):
     assert find_scada.scada_rules.match_keyword("rtu panel", "RTU")
 
 
+@pytest.mark.accore
 def test_15_batch_continues_after_failure(cfg):
     inp = Path(cfg["input_dir"])
     (inp / "a_bad.dwg").write_text("not a dwg")
@@ -124,6 +133,7 @@ def test_15_batch_continues_after_failure(cfg):
     assert "a_bad.dwg" in (out / "logs" / "errors.log").read_text(encoding="utf-8")
 
 
+@pytest.mark.accore
 def test_16_batch_uses_one_accoreconsole_launch(cfg):
     inp = Path(cfg["input_dir"])
     for n in range(5):
@@ -134,6 +144,7 @@ def test_16_batch_uses_one_accoreconsole_launch(cfg):
     assert len(logs) == 1          # whole batch inside a single accoreconsole process
 
 
+@pytest.mark.accore
 def test_17_corrupt_dwg_mid_batch_restarts_and_continues(cfg):
     inp = Path(cfg["input_dir"])
     shutil.copy(FIXTURE, inp / "a.dwg")
@@ -145,6 +156,7 @@ def test_17_corrupt_dwg_mid_batch_restarts_and_continues(cfg):
     assert (out / "a.dxf").exists() and (out / "c.dxf").exists() and not (out / "b_bad.dxf").exists()
 
 
+@pytest.mark.accore
 def test_18_non_ansi_filename_uses_copy_and_source_untouched(cfg):
     inp = Path(cfg["input_dir"])
     src = inp / f"emoji_{chr(0x1F4D0)}.dwg"
@@ -154,6 +166,7 @@ def test_18_non_ansi_filename_uses_copy_and_source_untouched(cfg):
     assert s["ok"] == 1 and sha(src) == before
 
 
+@pytest.mark.accore
 def test_19_read_only_dwg_is_converted_not_failed(cfg):
     """A DWG with the read-only attribute makes AutoCAD ask 'open read-only?'; that must not be reported as corrupt."""
     import os

@@ -112,7 +112,7 @@ def test_docx_vertical_merge_preserves_origin(tmp_path,data_store,engineering_cf
 
 
 def test_ifc_nulls_explicit_empty_and_inheritance(tmp_path,data_store,engineering_cfg):
-    import ifcopenshell
+    ifcopenshell=pytest.importorskip('ifcopenshell')  # optional: requirements-ifc.txt
     m=ifcopenshell.file(schema='IFC4')
     m.create_entity('IfcCableCarrierSegment',GlobalId=GUID)
     m.create_entity('IfcSpace',GlobalId=ifcopenshell.guid.new(),Name='')

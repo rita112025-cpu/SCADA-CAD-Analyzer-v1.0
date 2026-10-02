@@ -8,6 +8,17 @@ from engineering_data import Store
 from common import load_config
 
 
+def pytest_collection_modifyitems(config, items):
+    """Tests marked `accore` drive a real AutoCAD accoreconsole; skip them (not fail) on machines without it."""
+    accore = load_config().get('accoreconsole') or ''
+    if Path(accore).is_file():
+        return
+    skip = pytest.mark.skip(reason=f'accoreconsole not found: {accore or "(not configured)"}')
+    for item in items:
+        if 'accore' in item.keywords:
+            item.add_marker(skip)
+
+
 @pytest.fixture
 def data_store(tmp_path):
     s = Store(tmp_path / 'project.db')

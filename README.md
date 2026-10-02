@@ -56,6 +56,11 @@ tkinter 介面：選輸入/輸出資料夾、勾選處理選項、編輯關鍵�
 GUI log 寫入 `output\logs\gui.log`。掃描不會執行 AutoCAD、不修改任何檔案。
 「產生 CSV」控制 analyze 的 CSV；`scada_hits.csv` 只要勾選「SCADA 關鍵字搜尋」就會產生。
 
+### 桌面捷徑
+雙擊 `create_shortcut.bat` 會在桌面建立「DWG分析」捷徑（圖示為 `dwg_analysis.ico`）。
+捷徑存的是絕對路徑：**搬移或改名資料夾後，捷徑與圖示都會失效**，在新位置再執行一次 `create_shortcut.bat` 即可。
+若 `.venv` 不存在，`app.bat` 會跳出對話框提示安裝步驟（而不是靜默無反應）。
+
 ## SCADA 搜尋規則（單一實作：`scripts\scada_rules.py`）
 - 英文關鍵字以「完整 token」比對、不分大小寫：`RACK` 命中 `RACK`、`rack`、`RACK-01`、`RACK_01`、`RACK01`、`RACK1`；不命中 `TRACK`、`TRACK01`、`BRACKET`、`RACKS`（關鍵字前面必須是邊界，後面可接邊界或數字，不可接英文字母）。以數字結尾的關鍵字（如 `SB12`）後面不可再接數字：`SB123` 不命中。`PANELBOARD` 不會命中 `PANEL`。
 - 工程尺寸尾碼只套用在 `engineering_suffix_keywords`（預設 `TRAY`）：`TRAYX600`、`trayX600`、`TRAYW300`、`TRAYH150`、`TRAY-300`、`TRAY_X600` 命中；`BETRAYAL`、`ENTRYWAY`、`XTRAY` 不命中。
@@ -107,7 +112,10 @@ run.bat
 
 ## 錯誤排除
 - `DXF not produced`：看 `output/logs/<name>_<id>.stdout.log`（accoreconsole 輸出為 UTF-16，已解碼）。
+- 捷徑沒有圖示或點了沒反應：資料夾被搬移/改名，重新執行 `create_shortcut.bat`。
 - 測試：`.venv\Scripts\python -m pytest tests -v`
+  - 暫存目錄固定在專案內 `.pytest_tmp\`（見 `pytest.ini`），避免 `%TEMP%\pytest-of-<user>` 權限問題。
+  - 需要 AutoCAD 的測試標記為 `accore`；`config.json` 的 `accoreconsole` 路徑不存在時會顯示為 skipped（原因列在結果最後），不算失敗。未安裝 `ifcopenshell` 時 IFC 測試同樣 skip。
 
 ## 限制（皆已實測）
 - accoreconsole 讀 script 使用系統 ANSI 碼頁；script 內的非 ASCII 字元（例如中文）會亂碼。因此 SAVEAS 目標使用 ASCII 暫存檔名，轉完再由 Python 改名到含中文/空白的最終路徑。
