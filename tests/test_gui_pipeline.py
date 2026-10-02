@@ -48,6 +48,7 @@ def test_scan_readonly_counts(env):
     assert before == sorted((p.name, p.stat().st_mtime) for p in inp.rglob("*"))
 
 
+@pytest.mark.accore
 def test_full_pipeline_chinese_paths_and_error_isolation(env):
     inp, cfg = env
     hashes = {p: sha(p) for p in inp.rglob("*.dwg")}
@@ -69,6 +70,7 @@ def test_full_pipeline_chinese_paths_and_error_isolation(env):
         assert len(list(csv.DictReader(f))) == s["keyword_hits"]
 
 
+@pytest.mark.accore
 def test_option_toggles(env):
     _, cfg = env
     s = pipeline.run_pipeline(cfg, dict(scada=False, csv=False, json=False, analyze=True))
@@ -79,6 +81,7 @@ def test_option_toggles(env):
     assert s["ok"] == 2
 
 
+@pytest.mark.accore
 def test_stop_before_start(env):
     _, cfg = env
     ev = threading.Event()
@@ -88,6 +91,7 @@ def test_stop_before_start(env):
     assert not list((Path(cfg["output_dir"]) / "dxf").rglob("*.dxf"))
 
 
+@pytest.mark.accore
 def test_stop_during_accoreconsole(env):
     _, cfg = env
     ev = threading.Event()
@@ -115,6 +119,7 @@ def test_fatal_when_accore_missing(env):
     assert s["fatal"] and s["ok"] == 0
 
 
+@pytest.mark.accore
 def test_gui_smoke(env, tk_root):
     import app as appmod
     inp, cfg = env
