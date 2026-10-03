@@ -136,8 +136,6 @@ class App:
         self.v_ptext = tk.StringVar(value="")
         self.v_current = tk.StringVar(value="")
         self.v_scan = tk.StringVar(value="")
-        self.v_env = {k: tk.StringVar(value=f"{k}: ...") for k in
-                      ("Python", "ezdxf", "AutoCAD", "accoreconsole")}
         self._build()
         self.root.after(100, self._poll)
         self._check_env()
@@ -170,23 +168,13 @@ class App:
         src = ttk.LabelFrame(main, text="① 來源　Source")
         src.pack(fill="x", **pad)
         env = ttk.Frame(src)
-        env.pack(fill="x", padx=6, pady=(4, 0))
-        self.env_labels = {}
-        for i, k in enumerate(self.v_env):
-            lb = ttk.Label(env, textvariable=self.v_env[k], wraplength=380, justify="left")
-            lb.grid(row=i // 2, column=i % 2, sticky="w", padx=(0, 16), pady=1)
-            self.env_labels[k] = lb
-        env.columnconfigure(0, weight=1)
-        env.columnconfigure(1, weight=1)
-        ttk.Button(env, text="重新檢查", command=self._check_env).grid(row=0, column=2, rowspan=2, padx=4)
+        env.pack(fill="x", padx=6, pady=(4, 2))
+        self.v_envline = tk.StringVar(value="環境檢查中...")
+        self.lbl_env = ttk.Label(env, textvariable=self.v_envline, justify="left")
+        self.lbl_env.pack(side="left", fill="x", expand=True)
+        self._wrap_to_width(self.lbl_env, env, margin=120)
+        ttk.Button(env, text="重新檢查", command=self._check_env).pack(side="right")
         self.v_accore = tk.StringVar(value="")
-        self.lbl_accore = ttk.Label(src, textvariable=self.v_accore, wraplength=700, justify="left")
-        self.lbl_accore.pack(fill="x", padx=6, pady=(2, 0))
-        self._wrap_to_width(self.lbl_accore, src)
-        note = ttk.Label(src, text="AutoCAD／accoreconsole 只在處理 DWG（流程 A）時需要；DXF、IFC、Excel、PDF、DOCX、"
-                                   "Navisworks 的分析（流程 B）不依賴 AutoCAD。", wraplength=700, justify="left")
-        note.pack(fill="x", padx=6, pady=(2, 4))
-        self._wrap_to_width(note, src)
 
         paths = ttk.Frame(src)
         paths.pack(fill="x", padx=6, pady=2)
@@ -213,12 +201,8 @@ class App:
 
         fa = ttk.LabelFrame(cols, text="A．DWG 批次轉 DXF（需要 AutoCAD）")
         fa.grid(row=0, column=0, sticky="nsew", padx=(0, 4))
-        na = ttk.Label(fa, text="讀取輸入資料夾內的 .dwg，用 accoreconsole 轉成 DXF，再解析並搜尋 SCADA 關鍵字。",
-                       wraplength=340, justify="left")
-        na.pack(fill="x", padx=6, pady=(4, 2))
-        self._wrap_to_width(na, fa)
         grid = ttk.Frame(fa)
-        grid.pack(fill="x", padx=6)
+        grid.pack(fill="x", padx=6, pady=(4, 0))
         items = [("recursive", "遞迴搜尋子資料夾"), ("convert", "DWG → DXF"),
                  ("analyze", "DXF 內容解析"), ("scada", "SCADA 關鍵字搜尋"),
                  ("csv", "產生 CSV"), ("json", "產生 JSON"), ("overwrite", "覆寫既有 DXF")]
@@ -229,13 +213,9 @@ class App:
 
         fb = ttk.LabelFrame(cols, text="B．工程資料分析（不需要 AutoCAD）")
         fb.grid(row=0, column=1, sticky="nsew", padx=(4, 0))
-        nb = ttk.Label(fb, text="直接解析 DXF、IFC、Excel/CSV、PDF、DOCX、Navisworks；選到 .dwg 時才會用到 AutoCAD。"
-                                "「遞迴搜尋」沿用左側設定。", wraplength=340, justify="left")
-        nb.pack(fill="x", padx=6, pady=(4, 2))
-        self._wrap_to_width(nb, fb)
         self.v_analysis = tk.StringVar(value="使用上方輸入資料夾，或選擇多個檔案")
         la = ttk.Label(fb, textvariable=self.v_analysis, wraplength=340, justify="left")
-        la.pack(fill="x", padx=6, pady=2)
+        la.pack(fill="x", padx=6, pady=(4, 2))
         self._wrap_to_width(la, fb)
         brow = ttk.Frame(fb)
         brow.pack(fill="x", padx=6, pady=2)
@@ -246,14 +226,18 @@ class App:
         self.btn_analysis = ttk.Button(fb, text="開始分析工程資料", command=self._start_analysis)
         self.btn_analysis.pack(anchor="w", padx=6, pady=6)
 
-        kw = ttk.LabelFrame(run, text="SCADA 關鍵字 Keywords（兩條流程共用，一行一個）")
-        kw.pack(fill="x", padx=6, pady=(2, 6))
-        self.kw_text = tk.Text(kw, height=3, width=30, font=("Consolas", 10))
+        kwhead = ttk.Frame(run)
+        kwhead.pack(fill="x", padx=6, pady=(2, 0))
+        self.btn_kw = ttk.Button(kwhead, text="▸ SCADA 關鍵字（兩條流程共用）", command=self._toggle_keywords)
+        self.btn_kw.pack(side="left")
+        self.kw = ttk.Frame(run)   # shown only on demand
+        self.kw_text = tk.Text(self.kw, height=3, width=30, font=("Consolas", 10))
         self.kw_text.pack(side="left", fill="both", expand=True, padx=6, pady=4)
         self.kw_text.insert("1.0", "\n".join(self.cfg.get("keywords", [])))
         self.kw_text.bind("<Tab>", lambda e: (e.widget.tk_focusNext().focus_set(), "break")[1])
         self.kw_text.bind("<Shift-Tab>", lambda e: (e.widget.tk_focusPrev().focus_set(), "break")[1])
-        ttk.Button(kw, text="儲存設定", command=self._save_config).pack(side="right", padx=8)
+        ttk.Button(self.kw, text="儲存設定", command=self._save_config).pack(side="right", padx=8)
+        ttk.Frame(run, height=4).pack()
 
         # ---- 3 執行狀態 ----
         st = ttk.LabelFrame(main, text="③ 執行狀態　Progress")
@@ -316,6 +300,14 @@ class App:
                 box.columnconfigure(col, weight=1, uniform=title)
         self.v_out.trace_add('write', lambda *args: self._refresh_analysis_outputs())
         self._refresh_analysis_outputs()
+
+    def _toggle_keywords(self):
+        if self.kw.winfo_manager():
+            self.kw.pack_forget()
+            self.btn_kw.configure(text="▸ SCADA 關鍵字（兩條流程共用）")
+        else:
+            self.kw.pack(fill="x", padx=6, pady=(0, 4), after=self.btn_kw.master)
+            self.btn_kw.configure(text="▾ SCADA 關鍵字（一行一個）")
 
     def _wrap_to_width(self, label, container, margin=40):
         """Keep a wrapping label as wide as its container so text is never cut off."""
@@ -475,8 +467,7 @@ class App:
 
     # ---------- environment ----------
     def _check_env(self):
-        for v in self.v_env.values():
-            v.set(v.get().split(":")[0] + ": ...")
+        self.v_envline.set("環境檢查中...")
         self.btn_start.configure(state="disabled")
 
         def work():
@@ -518,10 +509,8 @@ class App:
     def _on_env(self, r):
         def mark(ok):
             return "OK" if ok else "NOT FOUND"
-        self.v_env["Python"].set(f"Python: {mark(bool(r['python']))} {r['python']}")
-        self.v_env["ezdxf"].set(f"ezdxf: {mark(bool(r['ezdxf']))} {r['ezdxf']}")
-        self.v_env["AutoCAD"].set(f"AutoCAD: {mark(r['accore_ok'])} {r['autocad']}")
-        self.v_env["accoreconsole"].set(f"accoreconsole: {mark(r['accore_ok'])}")
+        self.v_envline.set(f"Python {mark(bool(r['python']))}　ezdxf {mark(bool(r['ezdxf']))}　"
+                           f"AutoCAD {mark(r['accore_ok'])}（DWG 轉 DXF 才需要）")
         self.env_ok = r["ok"]
         for line in r["lines"]:
             self._log("INFO", line)
@@ -656,7 +645,10 @@ class App:
 
 def main():
     root = tk.Tk()
+    root.withdraw()  # keep the empty frame hidden while widgets are built, so opening doesn't flash
     app = App(root)
+    root.update_idletasks()
+    root.deiconify()
 
     def on_close():
         if app._busy():
